@@ -1,4 +1,4 @@
-package ru.nrcki.BioKotlin.gff
+package ru.nrcki.bioKotlin
 
 import java.io.*
 
@@ -8,7 +8,7 @@ class Feature(val seqname: String, val source: String = ".", val type: String,
 	val frame: Int?, val attr: String){
 }
 
-fun lineToFeature(val line: String): Feature{
+fun lineToFeature(line: String): Feature{
 	val fields = line.toString().split("\t")
 	val frame = if(fields[7] ==".") null else fields[7].toInt()
 	val score = if(fields[5] == ".") null else fields[5].toDouble()

@@ -1,4 +1,4 @@
-package ru.nrcki.BioKotlin.GenomeStats
+package ru.nrcki.bioKotlin
 
 import java.io.*
 import kotlin.math.*
