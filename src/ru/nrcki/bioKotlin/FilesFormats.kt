@@ -1,4 +1,4 @@
-package ru.nrcki.bioKotlin
+/*package ru.nrcki.bioKotlin
 
 //Check Fasta.kt as more transparent realisation
 class Fasta(var title: String = "", var sequence: String = ""){
@@ -15,4 +15,4 @@ class Fasta(var title: String = "", var sequence: String = ""){
         println("Title is: " + title)
         println("Sequence is: " + sequence)
     }
-}
+}*/
