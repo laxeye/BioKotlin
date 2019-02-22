@@ -1,9 +1,7 @@
 package ru.nrcki.bioKotlin
 
 import java.io.*
-import kotlin.math.*
 import ru.nrcki.bioKotlin.*
-//import ru.nrcki.bioKotlin.Fasta.*
 /*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -16,8 +14,8 @@ data class GenomeData(val fileName: String,
 
 //GC content in percent
 fun getGC(dna: String): Double = dna.toUpperCase()
-	.map{if ((it == 'C') || (it == 'G')) 1 else 0}.sum().times(100.0).div(dna.length)
-fun getNs(dna: String): Int = dna.toUpperCase().map{if (it == 'N') 1 else 0}.sum()
+	.count({(it == 'C') || (it == 'G')}).times(100.0).div(dna.length)
+fun getNs(dna: String): Int = dna.toUpperCase().count({it == 'N'})
 
 fun mapToJSONString(m: Map<String, Any>): String =  m
 		.map{(k,v) -> if (v is String) "\"$k\": \"$v\"" else "\"$k\": $v"}
