@@ -8,20 +8,15 @@ import kotlin.math.round
 
 class Fastq() {
 
-	class Record(val header: String, val sequence: String, val qual: String){
-		//Take sequence ID 
-		val id = header.split(" ")[0]
-		//Provide sequence length as FastaRecord().length
-		val length = sequence.length
+	class Record(header: String, sequence: String, val qual: String): Fasta.Record(header, sequence){
 
-		//To do: format to line width 60 or other
-		fun asFasta(): String{
-			return ">$header\n$sequence"
+		fun asFastq(): String{
+			return "@$header\n$sequence\n+\n$qual"
 		}
 
-		fun qualsAsIntList(): List<Int> = sequence.map{it.toInt()}
-		fun minQual(): Int = sequence.map{it.toInt()}.min() ?: 0
-		fun meanQual(): Int = sequence.map{it.toInt()}.sum().div(length.toDouble()).toInt()
+		fun qualsAsIntList(): List<Int> = qual.map{it.toInt()}
+		fun minQual(): Int = qual.map{it.toInt()}.min() ?: 0
+		fun meanQual(): Int = qual.map{it.toInt()}.sum().div(length.toDouble()).toInt()
 
 	}
 
@@ -29,7 +24,7 @@ class Fastq() {
 		val temporaryList = mutableListOf<Fastq.Record>()
 
 		val seqFile = File(filename).bufferedReader().readLines()
-		if(seqFile.size == 0){
+		if(seqFile.size < 4){
 			throw Exception("Empty FASTQ file $filename")
 		}
 		var i = 0;

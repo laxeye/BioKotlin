@@ -6,15 +6,26 @@ import java.io.*
 
 class Fasta() {
 
-	class Record(val header: String, val sequence: String){
+	open class Record(val header: String, val sequence: String){
 		//Take sequence ID 
 		val id = header.split(" ")[0]
 		//Provide sequence length as FastaRecord().length
 		val length = sequence.length
 
-		//To do: format to line width 60 or other
+		val width = 60
+
+		fun fw(s: String, w: Int = width): String{
+			val lineList = mutableListOf<String>()
+			val steps = s.length.div(w)
+			for (i in 0..steps-1){
+				lineList.add(s.substring(w*i,w*(i+1)))
+			}
+			lineList.add(s.substring(w*steps))
+			return lineList.joinToString(separator="\n",prefix="",postfix="")
+		}
+
 		fun asFasta(): String{
-			return ">$header\n$sequence"
+			return ">$header\n${fw(sequence)}"
 		}
 	}
 
