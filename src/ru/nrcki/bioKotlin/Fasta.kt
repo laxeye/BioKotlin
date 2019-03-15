@@ -27,6 +27,15 @@ class Fasta() {
 		fun asFasta(): String{
 			return ">$header\n${fw(sequence)}"
 		}
+
+		open fun getLocus(start: Int, end: Int): Record{
+			val nstart = if(start < 1) 1 else start
+			val nend = if(end > this.length + 1) this.length else end
+			val seq = if(nend < nstart) revComp(this.sequence.substring(nend - 1, nstart)) else
+				this.sequence.substring(nstart - 1, nend)
+			val head = "${this.id} ($start:$end)"
+			return Record(head, seq)
+		}
 	}
 
 	fun read(filename: String): List<Fasta.Record>{
