@@ -12,29 +12,28 @@ fun makeAllTetra(): List<String>{
 	for(n in dinucs){
 		dinucs.map{tetranucs.add(n + it)}
 	}
-	return tetranucs.toList()
+	return tetranucs.toList().sorted()
 }
 
 fun main(args: Array<String>){
+	require(args.size>0) {"Provide file as a first argument"}
 	val allTetra = makeAllTetra()
 	val seqs = Fasta().read(args[0])
-	val fMap = mutableMapOf<String,Double>()
 	for (seq in seqs){
 		val tMap = mutableMapOf<String,Int>()
 		var i = 0
 		while(i+3 < seq.length){
 			val piece = seq.sequence.substring(i,i+4)
-			if(tMap.contains(piece)){
-				println(tMap.get(piece))
-				tMap.put(piece,tMap.get(piece)!!.inc())
-			}
-			tMap.put(piece, 1)
+			val count = tMap.getOrElse(piece,{0}) + 1
+			tMap.put(piece, count)
 			i++
 		}
-		tMap.keys.sorted().forEach(){
-			println("$it\t${tMap.get(it)}")
-//			println("$it\t${tMap.getOrElse(it,0)}")
+		print(seq.id)
+		allTetra.forEach(){
+			print("\t${tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)}")
+			// More time consumption if format() used
+			// print("\t%.5f".format(tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)))
 		}
-		println("")
+		print("\n")
 	}
 }
