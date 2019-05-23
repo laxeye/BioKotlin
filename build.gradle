@@ -51,7 +51,7 @@ dependencies {
 sourceSets {
     main {
         kotlin {
-            srcDir '.'
+            srcDir 'src/main/'
         }
     }
 }

@@ -6,15 +6,7 @@ There is a genome information module to collect some useful stats like n50, GC% 
 
 ## Compilation
 
-For sure You need a Kotlin compiler (>= 1.2 was tested). 
-
-To compile multiple files in one jar file use the following command:
-
-`kotlinc -d biokotlin.jar src/ru/nrcki/bioKotlin/*`
-
-If You plan to use it with any JVM language but Kotlin don't forget **-include-runtime** compiler flag.
-
-`kotlinc -include-runtime -d biokotlin.jar src/ru/nrcki/bioKotlin/*`
+Use Gradle to build the project.
 
 
 ## Tests
@@ -34,12 +26,6 @@ Tests:
 
 ## Project structure
 
-- all classes should be inside src/ru/nrcki/bioKotlin (to provide compatibility with build tools (ant, maven, gradle) and IDE)
-- all tests located in src/test/kotlin
-- all test data located in src/test/resources
-
-#### Package declaration in .kt for an inattentive guy
-
-- all files should begin with *package ru.nrcki.bioKotlin*
-- package names should be in lowercase
-- package names don't include names of classes
+- source src/main/kotlin/ru/nrcki/bioKotlin
+- tests src/test/kotlin
+- test data src/test/resources
