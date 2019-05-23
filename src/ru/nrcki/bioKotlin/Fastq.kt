@@ -1,6 +1,7 @@
 package ru.nrcki.bioKotlin
 
 import java.io.*
+import java.util.Scanner
 import kotlin.math.min
 import kotlin.math.round
 
@@ -11,7 +12,7 @@ class Fastq() {
 	class Record(header: String, sequence: String, val qual: String): Fasta.Record(header, sequence){
 
 		fun asFastq(): String{
-			return "@$header\n$sequence\n+\n$qual"
+			return "@$header\n$sequence\n+\n$qual\n"
 		}
 
 		fun qualsAsIntList(): List<Int> = qual.map{it.toInt()}
@@ -19,8 +20,9 @@ class Fastq() {
 		fun meanQual(): Int = qual.map{it.toInt()}.sum().div(length.toDouble()).toInt()
 
 	}
-
-	fun read(filename: String): List<Fastq.Record>{
+	/* Legacy fastq file reader */
+	/*
+	fun readBR(filename: String): List<Fastq.Record>{
 		val temporaryList = mutableListOf<Fastq.Record>()
 
 		val seqFile = File(filename).bufferedReader().readLines()
@@ -34,6 +36,56 @@ class Fastq() {
 		}
 
 		return temporaryList.toList()
+	}
+	*/
+
+	fun read(filename: String): List<Fastq.Record>{
+		val temporaryList = mutableListOf<Fastq.Record>()
+
+		val sc = Scanner(FileInputStream(filename))
+
+		var tmpHead = ""
+		var tmpSeq = ""
+		var i = 0
+
+		while(sc.hasNextLine()){
+			i++
+			val line = sc.nextLine()
+			val field = i.rem(4)
+			when(field){
+				1 -> tmpHead = line.drop(1)
+				2 -> tmpSeq = line
+				0 -> temporaryList.add(Fastq.Record(tmpHead, tmpSeq, line))
+			}
+		}
+
+		return temporaryList.toList()
+	}
+
+	fun readBR(filename: String): MutableList<Fastq.Record>{
+		val temporaryList = mutableListOf<Fastq.Record>()
+
+		//val seqReader = FileInputStream(filename).bufferedReader()
+		val seqReader = File(filename).bufferedReader()
+
+		var tmpHead = ""
+		var tmpSeq = ""
+		var i = 0
+		var line = seqReader.readLine()
+		
+		while(line != null){
+			i++
+			val field = i.rem(4)
+
+			if(field == 1) tmpHead = line.drop(1)
+			if(field == 2) tmpSeq = line
+			if(field == 0){
+				temporaryList.add(Fastq.Record(tmpHead, tmpSeq, line))
+			}
+			line = seqReader.readLine()
+		}
+		seqReader.close()
+		return temporaryList
 	}
 
 }

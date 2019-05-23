@@ -19,7 +19,7 @@ fun main(args: Array<String>){
 		println(firstRecord.asFasta())
 
 		//Print revcomplement
-		println(revComp(firstRecord.sequence))
+		println(DNA().revComp(firstRecord.sequence))
 
 		//Get locus 5..10  and print as FASTA
 		println(firstRecord.getLocus(5,10).asFasta())

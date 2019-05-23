@@ -2,14 +2,15 @@ package ru.nrcki.bioKotlin
 
 import java.io.*
 import ru.nrcki.bioKotlin.*
-/*
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-*/
-data class GenomeData(val fileName: String, 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class GenomeData(
 	val totalLength: Int, val contigCount: Int,
-	val GC: Double,	val n50: Int, val n90: Int, 
+	val GC: Double,	val N50: Int, val L50: Int, 
+	val N90: Int, val L90: Int,
 	val totalN: Int, val maxLength: Int)
 
 //GC content in percent
@@ -47,6 +48,10 @@ fun genomeStats(frList :List<Fasta.Record>): Map<String,Any>{
 			l90 = lengths.indexOf(it)
 		}
 	}
+	val maxLength = lengths[0]
+	val genomeData = GenomeData(totalLength, contigCount,
+	totalGC, n50, l50, n90, l90, totalN, maxLength)
+	println(Json.stringify(GenomeData.serializer(),genomeData))
 
 	val genomeDataMap = mapOf("totalLength" to totalLength, 
 			"contigCount" to contigCount,
@@ -56,8 +61,8 @@ fun genomeStats(frList :List<Fasta.Record>): Map<String,Any>{
 	return genomeDataMap
 }
 
-fun printGenomeStats(genomeDataMap: Map<String, Any>,f: String){
-	if(f=="json"){
+fun printGenomeStats(genomeDataMap: Map<String, Any>,format: String){
+	if(format=="json"){
 		println(mapToJSONString(genomeDataMap))
 	}else{
 		println("Total length: ${genomeDataMap.get("totalLength")}")

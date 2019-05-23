@@ -1,8 +1,7 @@
 package ru.nrcki.bioKotlin
 
 import java.io.*
-
-//To do: write FASTA (concatenate asFasta() represenations of all records)
+import ru.nrcki.bioKotlin.DNA
 
 class Fasta() {
 
@@ -14,7 +13,7 @@ class Fasta() {
 
 		val width = 60
 
-		fun fw(s: String, w: Int = width): String{
+		fun format(s: String, w: Int = width): String{
 			val lineList = mutableListOf<String>()
 			val steps = s.length.div(w)
 			for (i in 0..steps-1){
@@ -24,18 +23,20 @@ class Fasta() {
 			return lineList.joinToString(separator="\n",prefix="",postfix="")
 		}
 
-		fun asFasta(): String{
-			return ">$header\n${fw(sequence)}"
-		}
+		fun asFasta(): String = ">$header\n${format(sequence)}"
 
 		open fun getLocus(start: Int, end: Int): Record{
 			val nstart = if(start < 1) 1 else start
 			val nend = if(end > this.length + 1) this.length else end
-			val seq = if(nend < nstart) revComp(this.sequence.substring(nend - 1, nstart)) else
+			val seq = if(nend < nstart) DNA().revComp(this.sequence.substring(nend - 1, nstart)) else
 				this.sequence.substring(nstart - 1, nend)
 			val head = "${this.id} ($start:$end)"
 			return Record(head, seq)
 		}
+	}
+
+	fun asMultiFasta(RecList: List<Fasta.Record>): String{
+		return RecList.map{it.asFasta()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
 	fun read(filename: String): List<Fasta.Record>{

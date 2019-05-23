@@ -1,7 +1,7 @@
 package ru.nrcki.bioKotlin
 
 import ru.nrcki.bioKotlin.Fasta
-import ru.nrcki.bioKotlin.revComp
+import ru.nrcki.bioKotlin.DNA
 
 /*Returns all possible or only non self reverse-complemented tetramers*/
 fun makeTetraList(redundant: Boolean = false): List<String>{
@@ -19,7 +19,7 @@ fun makeTetraList(redundant: Boolean = false): List<String>{
 	}else{
 		for(n in dinucs){
 			dinucs.map{
-				if(! tetranucs.contains(revComp(n + it))) tetranucs.add(n + it)}
+				if(! tetranucs.contains(DNA().revComp(n + it))) tetranucs.add(n + it)}
 		}
 	}
 
@@ -33,8 +33,8 @@ fun calcTetra(seq: String): Map<String,Int>{
 	for(i in 0..lastIdx){
 		var piece = seq.substring(i,i+4)
 		if(piece in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
-		piece = revComp(piece)
-		if(revComp(piece) in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
+		piece = DNA().revComp(piece)
+		if(DNA().revComp(piece) in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
 	}
 	return tMap
 }
@@ -55,27 +55,27 @@ fun main(args: Array<String>){
 	val redundant = false
 	val allTetra = makeTetraList(redundant)
 	if(redundant){
-	for (seq in seqs){
-		val tMap = calcAllTetra(seq.sequence)
-		print(seq.id)
-		allTetra.forEach(){
-			print("\t${tMap.getOrElse(it,{0}).toDouble().times(100.0).div(seq.length-3)}")
-			// More time consumption if format() used
-			// print("\t%.5f".format(tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)))
+		for (seq in seqs){
+			val tMap = calcAllTetra(seq.sequence)
+			print(seq.id)
+			allTetra.forEach(){
+				print("\t${tMap.getOrElse(it,{0}).toDouble().times(100.0).div(seq.length-3)}")
+				// More time consumption if format() used
+				// print("\t%.5f".format(tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)))
+			}
+			print("\n")
 		}
-		print("\n")
-	}
 	}else{
-	for (seq in seqs){
-		val tMap = calcTetra(seq.sequence)
-		print(seq.id)
-		allTetra.forEach(){
-			print("\t${tMap.getOrElse(it,{0}).toDouble().times(100.0).div(seq.length-3)}")
-			// More time consumption if format() used
-			// print("\t%.5f".format(tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)))
-		}
-		print("\n")
+		for (seq in seqs){
+			val tMap = calcTetra(seq.sequence)
+			print(seq.id)
+			allTetra.forEach(){
+				print("\t${tMap.getOrElse(it,{0}).toDouble().times(100.0).div(seq.length-3)}")
+				// More time consumption if format() used
+				// print("\t%.5f".format(tMap.getOrElse(it,{0}).toDouble().div(seq.length-3)))
+			}
+			print("\n")
 
-	}
+		}
 	}
 }
