@@ -4,28 +4,29 @@
 FASTA, FASTQ and GFF basics are available. 
 There is a genome information module to collect some useful stats like n50, GC% etc.
 
+`java -jar bioKotlin.jar /path/to/genome.fasta`
+
 ## Compilation
 
-Use Gradle to build the project.
+Use Gradle to build the project:
 
+`gradle jar`
 
 ## Tests
 
-We plan to include more test files, now You can check only very basic things like fasta and fastq handling.
-
-To compile BioKotlin with tests use following:
-
-`kotlinc -include-runtime -d biokotlin.jar src/ru/nrcki/* src/test/kotlin/test.kt`
-
-Tests:
-
-`java -cp "biokotlin.jar" ru.nrcki.bioKotlin.TestKt fasta src/test/resources/antiTGFPv1M13F.fasta`
-
-`java -cp "biokotlin.jar" ru.nrcki.bioKotlin.TestKt fastq src/test/resources/SRR030257_1.head.fq`
-
+Run `gradle test` to perform few unit tests. Hopefully we'll have more in the future.
 
 ## Project structure
 
 - source src/main/kotlin/ru/nrcki/bioKotlin
 - tests src/test/kotlin
 - test data src/test/resources
+
+##Features
+
+- FASTA and FASTQ reading from files.
+- Getting any locus of sequence from FASTA file.
+- Genome statistics from FASTA: N50, L50, N90, L90, GC(%), N's.
+- GFF parsing.
+- Tetranucleotide composition statistics.
+- Removing orphan reads from paired-end FASTQ files (memory unefficient, but working).
