@@ -1,6 +1,7 @@
 package ru.nrcki.bioKotlin
 
 import java.io.*
+import ru.nrcki.bioKotlin.DNA
 import ru.nrcki.bioKotlin.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.*
@@ -13,24 +14,21 @@ data class GenomeData(
 	val N90: Int, val L90: Int,
 	val totalN: Int, val maxLength: Int)
 
-//GC content in percent
-fun getGC(dna: String): Double = dna.toUpperCase()
-	.count({(it == 'C') || (it == 'G')}).times(100.0).div(dna.length)
-fun getNs(dna: String): Int = dna.toUpperCase().count({it == 'N'})
-
+/* Deprecated
 fun mapToJSONString(m: Map<String, Any>): String =  m
 		.map{(k,v) -> if (v is String) "\"$k\": \"$v\"" else "\"$k\": $v"}
 		.joinToString(separator=", \n", prefix="{", postfix="}")
+*/
 
-fun genomeStats(frList :List<Fasta.Record>): Map<String,Any>{
+fun genomeStats(fastaRecords :List<Fasta.Record>): GenomeData{
 
-	val totalDNA = frList.map{it.sequence}.joinToString(separator="")
+	val totalDNA = fastaRecords.map{it.sequence}.joinToString(separator="")
 	val totalLength = totalDNA.length
-	val totalGC = getGC(totalDNA)
-	val totalN = getNs(totalDNA)
-	val contigCount = frList.size
+	val totalGC = DNA().getGCContent(totalDNA).times(100.0)
+	val totalN = DNA().getNsCount(totalDNA)
+	val contigCount = fastaRecords.size
 
-	val lengths = frList.map{it.length}.sortedWith(compareBy({-it}))
+	val lengths = fastaRecords.map{it.length}.sortedWith(compareBy({-it}))
 	var sum = 0
 	var n50 = 0
 	var n90 = 0
@@ -51,33 +49,23 @@ fun genomeStats(frList :List<Fasta.Record>): Map<String,Any>{
 	val maxLength = lengths[0]
 	val genomeData = GenomeData(totalLength, contigCount,
 	totalGC, n50, l50, n90, l90, totalN, maxLength)
-	println(Json.stringify(GenomeData.serializer(),genomeData))
 
-	val genomeDataMap = mapOf("totalLength" to totalLength, 
-			"contigCount" to contigCount,
-			"totalGC" to totalGC, "n50" to n50, "n90" to n90,
-			"l50" to l50, "l90" to l90, "totalN" to totalN, 
-			"maxLength" to lengths[0])
-	return genomeDataMap
+	return genomeData
 }
 
-fun printGenomeStats(genomeDataMap: Map<String, Any>,format: String){
+fun printGenomeStats(genomeData: GenomeData,format: String){
 	if(format=="json"){
-		println(mapToJSONString(genomeDataMap))
+		@UseExperimental(kotlinx.serialization.UnstableDefault::class)
+		println(Json.stringify(GenomeData.serializer(),genomeData))
 	}else{
-		println("Total length: ${genomeDataMap.get("totalLength")}")
-		println("Contig count: ${genomeDataMap.get("contigCount")}")
-		println("Maximum contig length: ${genomeDataMap.get("maxLength")}")
-		println("N50: ${genomeDataMap.get("n50")}\nN90: ${genomeDataMap.get("n90")}")
-		println("L50: ${genomeDataMap.get("l50")}\nL90: ${genomeDataMap.get("l90")}")
-		println("GC, %: ${"%.2f".format(genomeDataMap.get("totalGC"))}")
-		println("Ambiguous bases: ${genomeDataMap.get("totalN")}")
+		println("Total length: ${genomeData.totalLength}")
+		println("Contig count: ${genomeData.contigCount}")
+		println("Maximum contig length: ${genomeData.maxLength}")
+		println("N50: ${genomeData.N50}\nN90: ${genomeData.N90}")
+		println("L50: ${genomeData.L50}\nL90: ${genomeData.L90}")
+		println("GC, %: ${"%.2f".format(genomeData.GC)}")
+		println("Ambiguous bases: ${genomeData.totalN}")
 	}
-	/*
-	val gson = GsonBuilder().setPrettyPrinting().create()
-	val jsonOut: String = gson.toJson(genomeData)
-	println(jsonOut)
-	*/
 }
 
 fun main(args: Array<String>){
@@ -89,13 +77,13 @@ fun main(args: Array<String>){
 	}
 	val filename = args[0]
 	val fastaRecords = Fasta().read(filename)
-	val genomeDataMap = genomeStats(fastaRecords)
-	printGenomeStats(genomeDataMap,outMode)
+	val genomeData = genomeStats(fastaRecords)
+	printGenomeStats(genomeData, outMode)
 
 	if(longMode){
 		println("ID\tLength\tGC, %\tN")
 		fastaRecords.forEach(){
-			println("${it.id}\t${it.length}\t${getGC(it.sequence)}\t${getNs(it.sequence)}")
+			println("${it.id}\t${it.length}\t${DNA().getGCContent(it.sequence)}\t${DNA().getNsCount(it.sequence)}")
 		}
 	}
 }

@@ -5,11 +5,9 @@ import java.io.*
 
 fun main(args: Array<String>){
 	require(args.size == 2){"Ypu should provide 2 files!"}
-	var readsR = Fastq().readBR(args[1])
-	val readsIdR = readsR.map{it.id}
-	readsR.clear()
-	System.err.println("First file red.")
-	var readsF = Fastq().readBR(args[0])
+	val readsIdR = Fastq().readAutoBR(args[1]).map{it.id}
+	System.err.println("Forward IDs loaded.")
+	var readsF = Fastq().readAutoBR(args[0])
 	System.err.println("Secondfile red.")
 	val bothID = readsF.map{it.id}.intersect(readsIdR)
 	System.err.println("Intersection ready.")
@@ -17,11 +15,12 @@ fun main(args: Array<String>){
 	readsF.filter{it.id in bothID}.sortedBy{it.id}.forEach{
 		bfWriterF.write(it.asFastq())
 	}
+	//readsF = mutableListOf<Fastq.Record>("")
 	readsF.clear()
 	bfWriterF.close()
 
 	val bfWriterR = File("${args[1]}.paired").bufferedWriter()
-	Fastq().readBR(args[1]).filter{it.id in bothID}.sortedBy{it.id}.forEach{
+	Fastq().readAutoBR(args[1]).filter{it.id in bothID}.sortedBy{it.id}.forEach{
 		bfWriterR.write(it.asFastq())
 	}
 	bfWriterR.close()

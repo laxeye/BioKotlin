@@ -2,8 +2,9 @@ package ru.nrcki.bioKotlin
 
 import kotlin.test.*
 import kotlin.test.Test
-import ru.nrcki.bioKotlin.*
+import ru.nrcki.bioKotlin.Fastq
 import ru.nrcki.bioKotlin.Fasta
+import ru.nrcki.bioKotlin.DNA
 
 class AppTest {
 	@Test fun reverseComplementDNA() {
@@ -27,10 +28,32 @@ class AppTest {
 	@Test fun stringifyFasta() {
 		assertEquals(">ID\nGCAT",Fasta.Record("ID","GCAT").asFasta())
 	}
-	@Test fun readFastqFromFile() {
-		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
+	@Test fun readFastqFromFileBufferedReader() {
+		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
 			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
+	@Test fun readFastqFromFileScanner() {
+		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
+			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
+				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
+	}
+	@Test fun readFastqFromGZFileBufferedReader() {
+		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
+			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
+				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
+	}
+	@Test fun readFastqFromGZFileScanner() {
+		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
+			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
+				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
+	}
+	@Test fun `check GC content`() {
+		assertEquals(0.5,DNA().getGCContent("ACGT"))
+	}
+	
 }
