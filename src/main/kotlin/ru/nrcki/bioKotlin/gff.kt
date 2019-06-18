@@ -1,6 +1,6 @@
 package ru.nrcki.bioKotlin
 
-import java.io.*
+import java.io.File
 
 class GFF() {
 

@@ -24,7 +24,7 @@ Run `gradle test` to perform few unit tests. Hopefully we'll have more in the fu
 
 ##Features
 
-- FASTA and FASTQ reading from files.
+- FASTA, FASTQ and gzipped FASTQ reading from files.
 - Getting any locus of sequence from FASTA file.
 - Genome statistics from FASTA: N50, L50, N90, L90, GC(%), N's.
 - GFF parsing.

@@ -1,6 +1,7 @@
 package ru.nrcki.bioKotlin
 
-import java.io.*
+import java.io.FileInputStream
+import java.io.BufferedReader
 import ru.nrcki.bioKotlin.DNA
 
 class Fasta() {
@@ -35,16 +36,27 @@ class Fasta() {
 		}
 	}
 
-	fun asMultiFasta(RecList: List<Fasta.Record>): String{
-		return RecList.map{it.asFasta()}.joinToString(separator="\n",prefix="",postfix="")
+	fun asMultiFasta(recList: List<Fasta.Record>): String{
+		return recList.map{it.asFasta()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
 	fun read(filename: String): List<Fasta.Record>{
-		val temporaryList = mutableListOf<Fasta.Record>()
+		try {
+			return readBR(FileInputStream(filename).bufferedReader())
+		}
+		catch (e: Exception) {
+			System.err.println(e)
+			System.exit(1)
+			return listOf<Fasta.Record>()
+		}
+	}
 
-		val seqFile = File(filename).bufferedReader().readLines()
+	fun readBR(br: BufferedReader): List<Fasta.Record>{
+		val temporaryList = mutableListOf<Fasta.Record>()
+		val seqFile = br.readLines()
+		br.close()
 		if(seqFile.size == 0){
-			throw Exception("Empty FASTA file $filename")
+			throw Exception("Empty FASTA file")
 		}
 		var seq: String
 		var id: String = ""

@@ -1,6 +1,6 @@
 package ru.nrcki.bioKotlin
 
-import kotlin.test.*
+import kotlin.test.assertEquals
 import kotlin.test.Test
 import ru.nrcki.bioKotlin.Fastq
 import ru.nrcki.bioKotlin.Fasta
@@ -40,14 +40,26 @@ class AppTest {
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun readFastqFromGZFileBufferedReader() {
+	@Test fun `read Fastq from gzip file with BufferedReader`() {
 		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
 			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun readFastqFromGZFileScanner() {
+	@Test fun `read Fastq from gzip file with Scanner`() {
 		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
+			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
+				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
+	}
+	@Test fun `read Fastq from bzip2 file with BufferedReader`() {
+		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq.bz2")[0].asFastq(),
+			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
+				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
+	}
+	@Test fun `read Fastq from bzip2 file with Scanner`() {
+		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.bz2")[0].asFastq(),
 			Fastq.Record("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())

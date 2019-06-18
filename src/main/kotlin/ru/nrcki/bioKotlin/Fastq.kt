@@ -1,12 +1,12 @@
 package ru.nrcki.bioKotlin
 
-import java.io.*
+import java.io.FileInputStream
+import java.io.BufferedReader
 import java.util.Scanner
 import kotlin.math.min
 import kotlin.math.round
 import java.util.zip.GZIPInputStream
-
-//To do: write FASTA (concatenate asFasta() represenations of all records)
+import org.apache.commons.compress.compressors.bzip2.*
 
 class Fastq() {
 
@@ -36,6 +36,10 @@ class Fastq() {
 		return temporaryList.toList()
 	}
 	*/
+
+	fun asMultiFastq(recList: List<Fastq.Record>): String{
+		return recList.map{it.asFastq()}.joinToString(separator="\n",prefix="",postfix="")
+	}
 
 	fun readSC(sc: Scanner): List<Fastq.Record>{
 		val temporaryList = mutableListOf<Fastq.Record>()
@@ -81,11 +85,21 @@ class Fastq() {
 	}
 
 	fun readAutoSC(filename: String): List<Fastq.Record>{
-		val sc = if(filename.split(".").last() == "gz") Scanner(GZIPInputStream(FileInputStream(filename))) else Scanner(FileInputStream(filename))
+		val suffix = filename.split(".").last()
+		val sc = when(suffix){
+			"gz" -> Scanner(GZIPInputStream(FileInputStream(filename))) 
+			"bz2" -> Scanner(BZip2CompressorInputStream(FileInputStream(filename)))
+			else -> Scanner(FileInputStream(filename))
+		}
 		return readSC(sc)
 	}
 	fun readAutoBR(filename: String): MutableList<Fastq.Record>{
-		val br = if(filename.split(".").last() == "gz") GZIPInputStream(FileInputStream(filename)).bufferedReader() else FileInputStream(filename).bufferedReader()
+		val suffix = filename.split(".").last()
+		val br = when(suffix){
+			"gz" -> GZIPInputStream(FileInputStream(filename)).bufferedReader()
+			"bz2" -> BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader()
+			else -> FileInputStream(filename).bufferedReader()
+		}
 		return readBR(br)
 	}
 

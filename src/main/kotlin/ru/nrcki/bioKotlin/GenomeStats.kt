@@ -1,8 +1,7 @@
 package ru.nrcki.bioKotlin
 
-import java.io.*
 import ru.nrcki.bioKotlin.DNA
-import ru.nrcki.bioKotlin.*
+import ru.nrcki.bioKotlin.Fasta
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.*
 import kotlinx.serialization.Serializable
@@ -48,12 +47,12 @@ fun genomeStats(fastaRecords :List<Fasta.Record>): GenomeData{
 	}
 	val maxLength = lengths[0]
 	val genomeData = GenomeData(totalLength, contigCount,
-	totalGC, n50, l50, n90, l90, totalN, maxLength)
+		totalGC, n50, l50, n90, l90, totalN, maxLength)
 
 	return genomeData
 }
 
-fun printGenomeStats(genomeData: GenomeData,format: String){
+fun printGenomeStats(genomeData: GenomeData, format: String){
 	if(format=="json"){
 		@UseExperimental(kotlinx.serialization.UnstableDefault::class)
 		println(Json.stringify(GenomeData.serializer(),genomeData))
@@ -77,6 +76,10 @@ fun main(args: Array<String>){
 	}
 	val filename = args[0]
 	val fastaRecords = Fasta().read(filename)
+	if(fastaRecords.size == 0){
+		System.err.println("Empty file.")
+		System.exit(1)
+	}
 	val genomeData = genomeStats(fastaRecords)
 	printGenomeStats(genomeData, outMode)
 
