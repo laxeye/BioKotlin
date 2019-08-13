@@ -19,7 +19,7 @@ fun mapToJSONString(m: Map<String, Any>): String =  m
 		.joinToString(separator=", \n", prefix="{", postfix="}")
 */
 
-fun genomeStats(fastaRecords :List<Fasta.Record>): GenomeData{
+fun genomeStats(fastaRecords: List<Fasta.Record>): GenomeData{
 
 	val totalDNA = fastaRecords.map{it.sequence}.joinToString(separator="")
 	val totalLength = totalDNA.length

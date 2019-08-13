@@ -2,7 +2,9 @@ package ru.nrcki.bioKotlin
 
 import java.io.FileInputStream
 import java.io.BufferedReader
+import ru.nrcki.bioKotlin.Sequence
 import ru.nrcki.bioKotlin.DNA
+import ru.nrcki.bioKotlin.Protein
 
 class Fasta() {
 
@@ -13,6 +15,12 @@ class Fasta() {
 		val length = sequence.length
 
 		val width = 60
+
+		val gaplength = Sequence().getGapLength(sequence)
+
+		val xcount = sequence.toUpperCase().count({it == 'X'})
+
+		val ncount = sequence.toUpperCase().count({it == 'N'})
 
 		fun format(s: String, w: Int = width): String{
 			val lineList = mutableListOf<String>()
@@ -25,6 +33,9 @@ class Fasta() {
 		}
 
 		fun asFasta(): String = ">$header\n${format(sequence)}"
+		fun asAlnFasta(): String = ">$header\n$sequence"
+
+		open fun getChar(pos: Int): Char = this.sequence.get(pos)
 
 		open fun getLocus(start: Int, end: Int): Record{
 			val nstart = if(start < 1) 1 else start

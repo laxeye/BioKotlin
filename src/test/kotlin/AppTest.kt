@@ -2,18 +2,16 @@ package ru.nrcki.bioKotlin
 
 import kotlin.test.assertEquals
 import kotlin.test.Test
-import ru.nrcki.bioKotlin.Fastq
-import ru.nrcki.bioKotlin.Fasta
-import ru.nrcki.bioKotlin.DNA
+import ru.nrcki.bioKotlin.*
 
 class AppTest {
 	@Test fun reverseComplementDNA() {
 		assertEquals("ATGC",DNA().revComp("GCAT"))
 	}
-	@Test fun lengthOfSequence() {
+	@Test fun `length of Record`() {
 		assertEquals(4,Fasta.Record("ID","GCAT").length)
 	}
-	@Test fun idOfRecord() {
+	@Test fun `id of Record`() {
 		assertEquals("ID",Fasta.Record("ID [Taxon]","GCAT").id)
 	}
 	@Test fun headerOfRecord() {
@@ -66,6 +64,22 @@ class AppTest {
 	}
 	@Test fun `check GC content`() {
 		assertEquals(0.5,DNA().getGCContent("ACGT"))
+	}
+	
+	@Test fun `check GC skew`() {
+		assertEquals((3.0-2.0)/3.0,DNA().getGCSkew("GCGT"))
+	}
+	
+	@Test fun `convert DNA to RNA`() {
+		assertEquals("ACGU",DNA().toRNA("ACGT"))
+	}
+
+	@Test fun `total gap length in Record`() {
+		assertEquals(4,Fasta.Record("ID","G--C-A-T").gaplength)
+	}
+	
+	@Test fun `remove gaps from Record`() {
+		assertEquals("GCAT",Sequence().removeGaps("G--C-A-T"))
 	}
 	
 }
