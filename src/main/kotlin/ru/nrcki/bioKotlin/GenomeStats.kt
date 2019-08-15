@@ -1,5 +1,6 @@
 package ru.nrcki.bioKotlin
 
+import ru.nrcki.bioKotlin.Sequence
 import ru.nrcki.bioKotlin.DNA
 import ru.nrcki.bioKotlin.Fasta
 import kotlinx.serialization.json.Json
@@ -19,12 +20,12 @@ fun mapToJSONString(m: Map<String, Any>): String =  m
 		.joinToString(separator=", \n", prefix="{", postfix="}")
 */
 
-fun genomeStats(fastaRecords: List<Fasta.Record>): GenomeData{
+fun genomeStats(fastaRecords: List<Sequence>): GenomeData{
 
 	val totalDNA = fastaRecords.map{it.sequence}.joinToString(separator="")
 	val totalLength = totalDNA.length
-	val totalGC = DNA().getGCContent(totalDNA).times(100.0)
-	val totalN = DNA().getNsCount(totalDNA)
+	val totalGC = totalDNA.getGCContent().times(100.0)
+	val totalN = totalDNA.getNsCount()
 	val contigCount = fastaRecords.size
 
 	val lengths = fastaRecords.map{it.length}.sortedWith(compareBy({-it}))
@@ -86,7 +87,7 @@ fun main(args: Array<String>){
 	if(longMode){
 		println("ID\tLength\tGC, %\tN")
 		fastaRecords.forEach(){
-			println("${it.id}\t${it.length}\t${DNA().getGCContent(it.sequence)}\t${DNA().getNsCount(it.sequence)}")
+			println("${it.id}\t${it.length}\t${it.sequence.getGCContent()}\t${it.sequence.getNsCount()}")
 		}
 	}
 }

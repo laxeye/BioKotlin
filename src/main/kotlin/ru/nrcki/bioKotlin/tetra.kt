@@ -19,7 +19,7 @@ fun makeTetraList(redundant: Boolean = false): List<String>{
 	}else{
 		for(n in dinucs){
 			dinucs.map{
-				if(! tetranucs.contains(DNA().revComp(n + it))) tetranucs.add(n + it)}
+				if(! tetranucs.contains((n+it).revComp())) tetranucs.add(n + it)}
 		}
 	}
 
@@ -33,8 +33,8 @@ fun calcTetra(seq: String): Map<String,Int>{
 	for(i in 0..lastIdx){
 		var piece = seq.substring(i,i+4)
 		if(piece in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
-		piece = DNA().revComp(piece)
-		if(DNA().revComp(piece) in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
+		piece = piece.revComp()
+		if(piece.revComp() in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
 	}
 	return tMap
 }

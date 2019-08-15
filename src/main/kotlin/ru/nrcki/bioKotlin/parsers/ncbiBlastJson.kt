@@ -1,4 +1,4 @@
-package space.akorzhenkov
+package ru.nrcki.bioKotlin
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
