@@ -3,6 +3,7 @@ package ru.nrcki.bioKotlin
 import kotlin.test.assertEquals
 import kotlin.test.Test
 import ru.nrcki.bioKotlin.*
+import ru.nrcki.bioKotlin.IO.*
 
 class AppTest {
 	@Test fun reverseComplementDNA() {

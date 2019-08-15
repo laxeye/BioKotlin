@@ -1,4 +1,4 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.bioKotlin.IO
 
 import java.io.FileInputStream
 import java.io.BufferedReader
@@ -6,6 +6,7 @@ import java.util.Scanner
 import java.util.zip.GZIPInputStream
 import org.apache.commons.compress.compressors.bzip2.*
 import ru.nrcki.bioKotlin.Sequence
+import ru.nrcki.bioKotlin.SeqQual
 
 class Fasta(){
 

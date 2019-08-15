@@ -1,6 +1,6 @@
 package ru.nrcki.bioKotlin
 
-import ru.nrcki.bioKotlin.Fastq
+import ru.nrcki.bioKotlin.IO.Fastq
 import java.io.*
 
 fun main(args: Array<String>){

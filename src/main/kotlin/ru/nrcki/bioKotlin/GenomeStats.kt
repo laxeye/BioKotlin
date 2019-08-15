@@ -1,8 +1,7 @@
 package ru.nrcki.bioKotlin
 
-import ru.nrcki.bioKotlin.Sequence
-import ru.nrcki.bioKotlin.DNA
-import ru.nrcki.bioKotlin.Fasta
+import ru.nrcki.bioKotlin.*
+import ru.nrcki.bioKotlin.IO.Fasta
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.*
 import kotlinx.serialization.Serializable

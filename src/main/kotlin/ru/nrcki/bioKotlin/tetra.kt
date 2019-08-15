@@ -1,6 +1,6 @@
 package ru.nrcki.bioKotlin
 
-import ru.nrcki.bioKotlin.Fasta
+import ru.nrcki.bioKotlin.IO.Fasta
 import ru.nrcki.bioKotlin.DNA
 
 /*Returns all possible or only non self reverse-complemented tetramers*/
