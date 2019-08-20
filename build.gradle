@@ -57,7 +57,7 @@ test {
 }
 
 application {
-    mainClassName = 'ru.nrcki.bioKotlin.GenomeStatsKt'
+    mainClassName = 'ru.nrcki.biokotlin.StandaloneKt'
 }
 
 compileKotlin {
@@ -67,6 +67,6 @@ compileKotlin {
 }
 
 jar {
-    manifest { attributes 'Main-Class': 'ru.nrcki.bioKotlin.GenomeStatsKt' }
+    manifest { attributes 'Main-Class': 'ru.nrcki.biokotlin.StandaloneKt' }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

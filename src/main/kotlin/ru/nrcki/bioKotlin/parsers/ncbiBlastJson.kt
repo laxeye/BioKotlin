@@ -1,4 +1,4 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.biokotlin
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration

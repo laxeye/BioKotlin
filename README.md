@@ -2,13 +2,22 @@
 
 [Kotlin programming language](https://kotlinlang.org/) realisation of bioinformatics routine operations and file handling.
 FASTA, FASTQ and GFF basics are available. 
-There is a genome information module to collect some useful stats like n50, GC% etc.
 
-`java -jar bioKotlin.jar /path/to/genome.fasta`
+Now You can use following commands as:
+`java -jar bioKotlin.jar <command> <command arguments>`
+
+* GenomeStats <File> - output statistics (N50, GC etc.) for Fasta file.
+* TetraStats <File> - output tetranucleotide composition for each contig for Fasta file.
+* AlignmentStats <File> - output statistics for Fasta alignment.
+* FastaToSeqPhylip <File> - convert Fasta alignment to strict sequental Phylip (it may produce duplicated IDs).
+* FastqPairing <Forward> <Reverse> - check files for orphaned reads and write sorted.
+
+To see a short help message just run without any commands and arguments:
+`java -jar bioKotlin.jar`
 
 ## Compilation
 
-Use Gradle to build the project:
+Use [Gradle](https://gradle.org) to build the project:
 
 `gradle jar`
 
@@ -22,9 +31,9 @@ Run `gradle test` to perform few unit tests. Hopefully we'll have more in the fu
 - tests src/test/kotlin
 - test data src/test/resources
 
-##Features
+## Features
 
-- Reading FASTA (uncompressed) and FASTQ (uncompressed, gzip and bzip2) from files.
+- Reading FASTA (uncompressed, gzip, bzip2) and FASTQ (uncompressed, gzip and bzip2) from files.
 - Getting any locus of sequence from FASTA file without prior indexing (reverse complement if strart > end).
 - Genome statistics from FASTA: N50, L50, N90, L90, GC(%), N's.
 - GFF parsing.
@@ -32,10 +41,11 @@ Run `gradle test` to perform few unit tests. Hopefully we'll have more in the fu
 - Tetranucleotide composition statistics.
 - Removing orphan reads from paired-end FASTQ files (memory unefficient, but working).
 
-##ToDo
-- API description
-- DNA<->RNA, translation.
+## ToDo
+- **API description.**
+- DNA and RNA translation.
 - More tests.
+- Catch more exceptions.
 - NCBI BLASTp results parsing.
 - HMMER results parsing.
 - ...

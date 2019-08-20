@@ -1,6 +1,6 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.biokotlin
 
-import ru.nrcki.bioKotlin.Sequence
+import ru.nrcki.biokotlin.Sequence
 
 class Alignment(){
 
@@ -15,7 +15,7 @@ class Alignment(){
 	
 	fun getAmbCount(aln: List<Sequence>, type: String) {
 		if((type == "DNA") || (type == "RNA")){
- 			aln.map(){it.ncount}.sum() 
+ 			aln.map(){it.ncount}.sum()
 		} else {
 			aln.map(){it.xcount}.sum()
 		}
@@ -40,10 +40,20 @@ class Alignment(){
 	fun checkLength(aln: List<Sequence>): Boolean {
 		return aln.filter(){it.length != aln[0].length}.size == 0
 	}
-	fun printAsPhylipSeq(aln: List<Sequence>){
-		val size = aln.size
-		val length = aln[0].length
-		println("Not now!")
+	fun asPhylipSeq(aln: List<Sequence>, strict: Boolean = true): String{
+		val tmpPhylip = mutableListOf<String>("${aln.size} ${aln[0].length}")
+		for(seq in aln){
+			if(strict){
+				if(seq.id.length > 9){
+					tmpPhylip.add("${seq.id.substring(0,9)} ${seq.sequence}")
+				}else{
+					tmpPhylip.add("${seq.id.padEnd(9,' ')} ${seq.sequence}")
+				}
+			}else{
+				tmpPhylip.add("${seq.id} ${seq.sequence}")
+			}
+		}
+		return tmpPhylip.joinToString(separator = "\n")
 	}
 
 }

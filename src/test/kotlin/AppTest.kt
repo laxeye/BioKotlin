@@ -1,68 +1,103 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.biokotlin
 
 import kotlin.test.assertEquals
 import kotlin.test.Test
-import ru.nrcki.bioKotlin.*
-import ru.nrcki.bioKotlin.IO.*
+import ru.nrcki.biokotlin.*
+import ru.nrcki.biokotlin.IO.*
+import java.io.File
 
 class AppTest {
-	@Test fun reverseComplementDNA() {
+	@Test fun `Reverse complement DNA`() {
 		assertEquals("ATGC","GCAT".revComp())
 	}
-	@Test fun `length of Record`() {
+
+	@Test fun `Sequence length`() {
 		assertEquals(4,Sequence("ID","GCAT").length)
 	}
-	@Test fun `id of Record`() {
+
+	@Test fun `Sequence id`() {
 		assertEquals("ID",Sequence("ID [Taxon]","GCAT").id)
 	}
-	@Test fun headerOfRecord() {
+
+	@Test fun `Sequence header`() {
 		assertEquals("ID [Taxon]",Sequence("ID [Taxon]","GCAT").header)
 	}
-	@Test fun sequenceOfRecord() {
+
+	@Test fun `Sequence sequence`() {
 		assertEquals("GCAT",Sequence("ID","GCAT").sequence)
 	}
-	@Test fun stringifyFastq() {
+
+	@Test fun `Stringify Fastq with asFastq`() {
 		assertEquals("@ID\nGCAT\n+\nFFFF\n",SeqQual("ID","GCAT","FFFF").asFastq())
 	}
-	@Test fun stringifyFasta() {
+
+	@Test fun `Stringify Fasta with asFasta`() {
 		assertEquals(">ID\nGCAT",Sequence("ID","GCAT").asFasta())
 	}
-	@Test fun readFastqFromFileBufferedReader() {
+
+	@Test fun `Read Fasta from File with BufferedReader`() {
+		assertEquals(Fasta().read("src/test/resources/antiTGFPv1M13F.fasta")[0].asFasta(),
+			Sequence("antiTGFPv1M13F",
+				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
+			.asFasta())
+	}
+
+	@Test fun `Read gzipped Fasta from File with BufferedReader`() {
+		assertEquals(Fasta().readGzip("src/test/resources/antiTGFPv1M13F.fasta.gz")[0].asFasta(),
+			Sequence("antiTGFPv1M13F",
+				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
+			.asFasta())
+	}
+
+	@Test fun `Read bzipped Fasta from File with BufferedReader`() {
+		assertEquals(Fasta().readBzip2("src/test/resources/antiTGFPv1M13F.fasta.bz2")[0].asFasta(),
+			Sequence("antiTGFPv1M13F",
+				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
+			.asFasta())
+	}
+
+	@Test fun `Read Fastq from file with BufferedReader`() {
 		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun readFastqFromFileScanner() {
+
+	@Test fun `Read Fastq from file with Scanner`() {
 		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun `read Fastq from gzip file with BufferedReader`() {
+
+	@Test fun `Read Fastq from gzip file with BufferedReader`() {
 		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun `read Fastq from gzip file with Scanner`() {
+
+	@Test fun `Read Fastq from gzip file with Scanner`() {
 		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun `read Fastq from bzip2 file with BufferedReader`() {
+
+	@Test fun `Read Fastq from bzip2 file with BufferedReader`() {
 		assertEquals(Fastq().readAutoBR("src/test/resources/SRR030257_1.head.fq.bz2")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
-	@Test fun `read Fastq from bzip2 file with Scanner`() {
+
+	@Test fun `Read Fastq from bzip2 file with Scanner`() {
 		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.bz2")[0].asFastq(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
+
 	@Test fun `check GC content`() {
 		assertEquals(0.5,"ACGT".getGCContent())
 	}
@@ -80,12 +115,16 @@ class AppTest {
 		assertEquals("ACGU",DNA("","ACGT").toRNA())
 	}
 
-	@Test fun `total gap length in Record`() {
+	@Test fun `total gap length in sequence`() {
 		assertEquals(4,Sequence("ID","G--C-A-T").gaplength)
 	}
 	
-	@Test fun `remove gaps from Record`() {
+	@Test fun `remove gaps from sequence`() {
 		assertEquals("GCAT",Sequence("","G--C-A-T").removeGaps())
 	}
 	
+	@Test fun `Convert Fasta to Phylip`(){
+		assertEquals("10 120",
+			Alignment().asPhylipSeq(Fasta().read("src/test/resources/alignment.16s.fasta")).lines()[0])
+	}
 }

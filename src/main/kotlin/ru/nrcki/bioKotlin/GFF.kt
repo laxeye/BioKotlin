@@ -1,4 +1,4 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.biokotlin.io
 
 import java.io.File
 

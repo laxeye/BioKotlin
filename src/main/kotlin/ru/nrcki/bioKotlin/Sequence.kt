@@ -1,4 +1,4 @@
-package ru.nrcki.bioKotlin
+package ru.nrcki.biokotlin
 import kotlin.math.min
 import kotlin.math.max
 
