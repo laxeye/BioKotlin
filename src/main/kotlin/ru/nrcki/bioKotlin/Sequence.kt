@@ -15,11 +15,14 @@ open class Sequence(val header: String, val sequence: String) {
 	
 	val length = sequence.length
 
-	val gaplength = getGapLength(sequence)
+	val gaplength: Int
+		get() = getGapLength(sequence)
 
-	val xcount = sequence.toUpperCase().count({it == 'X'})
+	val xcount: Int 
+		get() = sequence.toUpperCase().count({it == 'X'})
 
-	val ncount = sequence.toUpperCase().count({it == 'N'})
+	val ncount: Int
+		get() = sequence.toUpperCase().count({it == 'N'})
 
 	val _width = 60
 
@@ -99,15 +102,14 @@ class DNA(header: String, sequence: String): Sequence(header, sequence) {
 	//Provisionally RNA functionality will be here
 	val _unambiguous = listOf('A','C','G','T','U')
 	
-	val GCContent: Double = this.sequence.toUpperCase()
-	.count({(it == 'C') || (it == 'G')}).times(1.0).div(this.length)
+	val GCContent: Double 
+		get() = this.sequence.toUpperCase()
+		.count({(it == 'C') || (it == 'G')}).times(1.0).div(this.length)
 
 	// GCskew = (G - C) / (G + C)
 	fun getGCSkew(): Double = (this.sequence.toUpperCase()
-	.count({it == 'G'}) - this.sequence.toUpperCase().count({it == 'C'}))
-	.times(1.0).div(this.sequence.toUpperCase().count({(it == 'C') || (it == 'G')}))
-
-	val NsCount: Int = this.sequence.toUpperCase().count({it == 'N'})
+		.count({it == 'G'}) - this.sequence.toUpperCase().count({it == 'C'}))
+		.times(1.0).div(this.sequence.toUpperCase().count({(it == 'C') || (it == 'G')}))
 
 	fun getAmbiguous(dna: String): Int = dna.toUpperCase().count({ !( it in _unambiguous ) })
 
