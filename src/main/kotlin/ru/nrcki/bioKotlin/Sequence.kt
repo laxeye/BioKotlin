@@ -38,6 +38,8 @@ open class Sequence(val header: String, val sequence: String) {
 
 	fun asFasta(): String = ">$header\n${formatFasta(sequence)}"
 
+	override fun toString(): String = ">$header\n$sequence"
+
 	fun asAlnFasta(): String = ">$header\n$sequence"
 
 	open fun getChar(pos: Int): Char = this.sequence.get(pos)

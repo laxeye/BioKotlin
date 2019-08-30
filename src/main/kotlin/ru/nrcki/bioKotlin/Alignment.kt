@@ -26,9 +26,8 @@ class Alignment(){
 	fun getGapShare(aln: List<Sequence>): Double = getGapLength(aln)
 		.times(1.0).div(aln[0].length * aln.size)
 
-	fun prinAlnInfo(aln: List<Sequence>) {
+	fun printAlnInfo(aln: List<Sequence>) {
 		val valid = checkLength(aln)
-		//val gapLength = getGapLength(aln)
 		val gapShare = getGapShare(aln)
 		val size = aln.size
 		val length = aln[0].length
@@ -40,20 +39,34 @@ class Alignment(){
 	fun checkLength(aln: List<Sequence>): Boolean {
 		return aln.filter(){it.length != aln[0].length}.size == 0
 	}
+
+	// Sequential PHYLIP alignment format
 	fun asPhylipSeq(aln: List<Sequence>, strict: Boolean = true): String{
+		
+		// Strict mode (ID length eq 9) may produce duplicating IDs
 		val tmpPhylip = mutableListOf<String>("${aln.size} ${aln[0].length}")
 		for(seq in aln){
 			if(strict){
-				if(seq.id.length > 9){
-					tmpPhylip.add("${seq.id.substring(0,9)} ${seq.sequence}")
-				}else{
-					tmpPhylip.add("${seq.id.padEnd(9,' ')} ${seq.sequence}")
-				}
+				val strictID = if(seq.id.length > 9) seq.id.substring(0,9) else seq.id.padEnd(9,' ')
+				tmpPhylip.add("$strictID ${seq.sequence}")
 			}else{
 				tmpPhylip.add("${seq.id} ${seq.sequence}")
 			}
 		}
 		return tmpPhylip.joinToString(separator = "\n")
 	}
+
+	fun clearGappedColumns(aln: List<Sequence>, maxGapShare: Double = 0.5): List<Sequence> {
+		val alnColumns = getAlnCols(aln)
+		val cleanColumns = alnColumns.filter(){(it.count({it == '-'}).toDouble() / it.length.toDouble()) < maxGapShare}
+		val cleanedFasta = mutableListOf<Sequence>()
+		for(i in 0 until aln.size){
+			cleanedFasta.add(Sequence(aln[i].header, cleanColumns.map(){it.get(i)}.joinToString("")))
+		}
+		
+		return cleanedFasta.toList()
+
+	}
+
 
 }

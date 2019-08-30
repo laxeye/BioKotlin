@@ -15,6 +15,17 @@ class Fasta(){
 		return recList.map{it.asFasta()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
+	fun readAuto(filename: String): List<Sequence>{
+		val suffix = filename.split(".").last()
+		val fasta = when(suffix){
+			"gz" -> readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
+			"bz2" -> readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
+			else -> readBR(FileInputStream(filename).bufferedReader())
+		}
+		return fasta
+	}
+
+
 	fun read(filename: String): List<Sequence>{
 		try {
 			return readBR(FileInputStream(filename).bufferedReader())
@@ -156,14 +167,15 @@ class Fastq() {
 		}
 		return readSC(sc)
 	}
-	fun readAutoBR(filename: String): MutableList<SeqQual>{
+
+	fun readAutoBR(filename: String): List<SeqQual>{
 		val suffix = filename.split(".").last()
 		val br = when(suffix){
 			"gz" -> GZIPInputStream(FileInputStream(filename)).bufferedReader()
 			"bz2" -> BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader()
 			else -> FileInputStream(filename).bufferedReader()
 		}
-		return readBR(br)
+		return readBR(br).toList()
 	}
 
 
@@ -179,7 +191,7 @@ class Fastq() {
 			bfWriterF.write(it.asFastq())
 		}
 		//readsF = mutableListOf<Fastq.Record>("")
-		readsF.clear()
+		//readsF.clear()
 		bfWriterF.close()
 
 		val bfWriterR = File("paired.$file2").bufferedWriter()

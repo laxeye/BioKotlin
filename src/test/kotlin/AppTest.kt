@@ -3,7 +3,7 @@ package ru.nrcki.biokotlin
 import kotlin.test.assertEquals
 import kotlin.test.Test
 import ru.nrcki.biokotlin.*
-import ru.nrcki.biokotlin.IO.*
+import ru.nrcki.biokotlin.io.*
 import java.io.File
 
 class AppTest {

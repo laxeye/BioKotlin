@@ -9,8 +9,13 @@ Now You can use following commands as:
 * GenomeStats <File> - output statistics (N50, GC etc.) for Fasta file.
 * TetraStats <File> - output tetranucleotide composition for each contig for Fasta file.
 * AlignmentStats <File> - output statistics for Fasta alignment.
+* AlignmentClearGaps <File> <0-100> - treshold gap share to remove column from alignment. Integer value, columns containng less than this value still in the alignment.
 * FastaToSeqPhylip <File> - convert Fasta alignment to strict sequental Phylip (it may produce duplicated IDs).
 * FastqPairing <Forward> <Reverse> - check files for orphaned reads and write sorted.
+* FilterShortSeqsFasta <File> <minimum length> - filter out short sequences FASTA.
+* FilterShortSeqsFastq <File> <minimum length> - filter out short sequences FASTQ.
+
+Data will be printed to standard output.	
 
 To see a short help message just run without any commands and arguments:
 `java -jar bioKotlin.jar`
@@ -33,8 +38,9 @@ Run `gradle test` to perform few unit tests. Hopefully we'll have more in the fu
 
 ## Features
 
-- Reading FASTA (uncompressed, gzip, bzip2) and FASTQ (uncompressed, gzip and bzip2) from files.
-- Getting any locus of sequence from FASTA file without prior indexing (reverse complement if strart > end).
+- Read FASTA (uncompressed, gzip, bzip2) and FASTQ (uncompressed, gzip and bzip2) from files.
+- Get any locus of sequence from FASTA file without prior indexing (reverse complement if start > end).
+- Filter sequences by length.
 - Genome statistics from FASTA: N50, L50, N90, L90, GC(%), N's.
 - GFF parsing.
 - NCBI BLASTn results parsing for JSON (-outfmt 15).
