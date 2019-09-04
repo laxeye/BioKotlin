@@ -10,7 +10,7 @@ Now You can use following commands as:
 * TetraStats <File> - output tetranucleotide composition for each contig for Fasta file.
 * AlignmentStats <File> - output statistics for Fasta alignment.
 * AlignmentClearGaps <File> <0-100> - treshold gap share to remove column from alignment. Integer value, columns containng less than this value still in the alignment.
-* FastaToSeqPhylip <File> - convert Fasta alignment to strict sequental Phylip (it may produce duplicated IDs).
+* FastaToSeqPhylip <File> [nostrict] - convert Fasta alignment sequental Phylip format. It may produce duplicated IDs in strict mode. Some software can use only strict Phylip format (like PHYLIP programs), while other (e.g. FastME) may use "non-strict" alignments.
 * FastqPairing <Forward> <Reverse> - check files for orphaned reads and write sorted.
 * FilterShortSeqsFasta <File> <minimum length> - filter out short sequences FASTA.
 * FilterShortSeqsFastq <File> <minimum length> - filter out short sequences FASTQ.

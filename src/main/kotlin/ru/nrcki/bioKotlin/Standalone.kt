@@ -14,7 +14,8 @@ fun main(args: Array<String>){
 	AlignmentClearGaps <File> <0-100> - treshold gap share to remove column from alignment.
 	FilterShortSeqsFasta <File> <minimum length> - filter out short sequences FASTA.
 	FilterShortSeqsFastq <File> <minimum length> - filter out short sequences FASTQ.
-	FastaToSeqPhylip <File> - convert Fasta alignment to strict sequental Phylip.
+	FastaToSeqPhylip <File> [nostrict]- convert Fasta alignment to strict sequental Phylip. 
+	When "nostrict" mode used name of sequnces will not be trimmed to 9 symbols.
 	FastqPairing <Forward> <Reverse> - check files for orphaned reads and write sorted.
 	"""
 
@@ -34,7 +35,13 @@ fun main(args: Array<String>){
 		"FilterShortSeqsFastq" -> {
 			Fastq().readAutoBR(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.asFastq())}
 		}
-		"FastaToSeqPhylip" -> println(Alignment().asPhylipSeq(Fasta().read(args[1])))
+		"FastaToSeqPhylip" -> {
+			if((args.size > 2) && (args[2].toString() == "nostrict")){
+				println(Alignment().asPhylipSeq(Fasta().read(args[1]), false))
+			}else{
+				println(Alignment().asPhylipSeq(Fasta().read(args[1])))
+			}
+		}
 		"FastqPairing" -> Fastq().fastqPairing(args[1],args[2])
 		else -> println(helpMessage)
 	}
