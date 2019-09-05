@@ -5,6 +5,7 @@ import kotlin.test.Test
 import ru.nrcki.biokotlin.*
 import ru.nrcki.biokotlin.io.*
 import java.io.File
+import kotlin.math.abs
 
 class AppTest {
 	@Test fun `Reverse complement DNA`() {
@@ -98,17 +99,17 @@ class AppTest {
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
 	}
 
-	@Test fun `check GC content`() {
-		assertEquals(0.5,"ACGT".getGCContent())
+	@Test fun `check GC content String method`() {
+		assertEquals(0.5, "ACGT".getGCContent() )
 	}
 	
-	@Test fun `check GC content 2`() {
-		assertEquals(0.5,DNA("","ACGT").GCContent)
+	@Test fun `check GC content val`() {
+		assertEquals(0.5, DNA("","ACGT").GCContent)
 	}
 	
 
-	@Test fun `check GC skew`() {
-		assertEquals((3.0-2.0)/3.0,DNA("","GCGT").getGCSkew())
+	@Test fun `check GC skew val`() {
+		assertEquals( (3.0-2.0)/3.0, DNA("","GCGT").GCSkew)
 	}
 	
 	@Test fun `convert DNA to RNA`() {
@@ -116,15 +117,29 @@ class AppTest {
 	}
 
 	@Test fun `total gap length in sequence`() {
-		assertEquals(4,Sequence("ID","G--C-A-T").gaplength)
+		assertEquals(4, Sequence("ID","G--C-A-T").gaplength)
 	}
 	
-	@Test fun `remove gaps from sequence`() {
-		assertEquals("GCAT",Sequence("","G--C-A-T").removeGaps())
+	@Test fun `remove gaps from sequence String method`() {
+		assertEquals( "GCAT", Sequence("","G--C-A-T").sequence.removeGaps() )
+	}
+	
+	@Test fun `remove gaps from sequence Sequence method`() {
+		assertEquals( "GCAT", Sequence("","G--C-A-T").removeGaps().sequence )
 	}
 	
 	@Test fun `Convert Fasta to Phylip`(){
 		assertEquals("10 120",
 			Alignment().asPhylipSeq(Fasta().read("src/test/resources/alignment.16s.fasta")).lines()[0])
 	}
+
+	@Test fun `Raw distance`(){
+		assertEquals(0.0, Distance().rawDistance(Sequence("ID","-ACG"),Sequence("ID","-ACG")))
+	}
+
+	@Test fun `Jukes-Cantor distance`(){
+		assertEquals(0.0, abs( Distance().jcDistance( Sequence("ID","TACG"), Sequence("ID","TACG") ) ) )
+	}
+
+
 }

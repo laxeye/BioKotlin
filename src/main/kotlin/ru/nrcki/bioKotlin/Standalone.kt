@@ -2,7 +2,7 @@ package ru.nrcki.biokotlin
 
 import ru.nrcki.biokotlin.*
 import ru.nrcki.biokotlin.io.*
-import ru.nrcki.biokotlin.GenomeStats
+import java.io.File
 
 fun main(args: Array<String>){
 	val helpMessage = """
@@ -35,6 +35,14 @@ fun main(args: Array<String>){
 		"FilterShortSeqsFastq" -> {
 			Fastq().readAutoBR(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.asFastq())}
 		}
+		"RemoveByName" -> {
+			val removeList = File(args[2]).readLines()
+			Fasta().readAuto(args[1]).filter(){ ! (it.id in removeList) }.map{println(it.asFasta())}
+		}
+		"ExtractByName" -> {
+			val extractList = File(args[2]).readLines()
+			Fasta().readAuto(args[1]).filter(){ it.id in extractList }.map{println(it.asFasta())}
+		}
 		"FastaToSeqPhylip" -> {
 			if((args.size > 2) && (args[2].toString() == "nostrict")){
 				println(Alignment().asPhylipSeq(Fasta().read(args[1]), false))
@@ -42,8 +50,11 @@ fun main(args: Array<String>){
 				println(Alignment().asPhylipSeq(Fasta().read(args[1])))
 			}
 		}
-		"FastqPairing" -> Fastq().fastqPairing(args[1],args[2])
-		else -> println(helpMessage)
+		"FastqPairing" 		-> Fastq().fastqPairing(args[1],args[2])
+		"DistMatNuclJC" 	-> Distance().jcMatrix(Fasta().read(args[1]),true)
+		"DistMatProtJC" 	-> Distance().jcMatrix(Fasta().read(args[1]),false)
+		"DistMeanProtJC" 	-> Distance().jcMeanDistance(Fasta().read(args[1]),false)
+		else -> System.err.print(helpMessage)
 	}
 
 }

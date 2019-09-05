@@ -9,7 +9,7 @@ open class Sequence(val header: String, val sequence: String) {
 	fun getGapShare(sequence: String): Double = sequence.count({it == '-'}).times(1.0)
 		.div(sequence.length)
 
-	fun removeGaps(): String = this.sequence.filter{it != '-'}
+	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter{it != '-'})
 
 	val id = header.split(" ")[0]
 	
@@ -109,7 +109,8 @@ class DNA(header: String, sequence: String): Sequence(header, sequence) {
 		.count({(it == 'C') || (it == 'G')}).times(1.0).div(this.length)
 
 	// GCskew = (G - C) / (G + C)
-	fun getGCSkew(): Double = (this.sequence.toUpperCase()
+	val GCSkew: Double
+		get() = (this.sequence.toUpperCase()
 		.count({it == 'G'}) - this.sequence.toUpperCase().count({it == 'C'}))
 		.times(1.0).div(this.sequence.toUpperCase().count({(it == 'C') || (it == 'G')}))
 
