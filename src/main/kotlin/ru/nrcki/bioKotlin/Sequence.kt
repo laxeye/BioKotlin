@@ -1,22 +1,34 @@
 package ru.nrcki.biokotlin
-import kotlin.math.min
-import kotlin.math.max
 
-open class Sequence(val header: String, val sequence: String) {
+interface BioSequence {
+
+}
+
+open class Sequence(val header: String, val sequence: String): BioSequence {
 	
 	fun getGapLength(sequence: String): Int = sequence.count({it == '-'})
 
-	fun getGapShare(sequence: String): Double = sequence.count({it == '-'}).times(1.0)
+	fun getGapShare(sequence: String): Double = sequence.count({it == '-'}).toDouble()
 		.div(sequence.length)
 
 	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter{it != '-'})
 
-	val id = header.split(" ")[0]
-	
+	val id: String = header.split(" ").get(0)
+
 	val length = sequence.length
 
 	val gaplength: Int
 		get() = getGapLength(sequence)
+
+	fun getGapCount(): Int {
+		var count = 0
+		var prev = 'A'
+		this.sequence.forEach(){
+			if ( (it == '-') && (prev != '-') ) count++
+			prev = it
+		}
+		return count
+	}
 
 	val xcount: Int 
 		get() = sequence.toUpperCase().count({it == 'X'})
@@ -24,7 +36,7 @@ open class Sequence(val header: String, val sequence: String) {
 	val ncount: Int
 		get() = sequence.toUpperCase().count({it == 'N'})
 
-	val _width = 60
+	private val _width = 60
 
 	fun formatFasta(seq: String, w: Int = _width): String{
 		val lineList = mutableListOf<String>()
@@ -40,17 +52,16 @@ open class Sequence(val header: String, val sequence: String) {
 
 	override fun toString(): String = ">$header\n$sequence"
 
-	fun asAlnFasta(): String = ">$header\n$sequence"
-
 	open fun getChar(pos: Int): Char = this.sequence.get(pos)
 
+	/* 1-based! */
 	open fun getLocus(start: Int, end: Int): Sequence{
 		val nstart = if(start < 1) 1 else start
 		val nend = if(end > this.length + 1) this.length else end
-		val seq = if(nend < nstart) this.sequence.substring(nend - 1, nstart).revComp() else
+		val subseq = if(nend < nstart) this.sequence.substring(nend - 1, nstart).revComp() else
 			this.sequence.substring(nstart - 1, nend)
 		val head = "${this.id} ($start:$end)"
-		return Sequence(head, seq)
+		return Sequence(head, subseq)
 	}
 
 }
@@ -60,12 +71,14 @@ open class SeqQual(header: String, sequence: String, val qual: String): Sequence
 	fun asFastq(): String = "@$header\n$sequence\n+\n$qual\n"
 	
 	fun qualsAsIntList(): List<Int> = qual.map{it.toInt()}
-	
-	fun minQual(): Int = qual.map{it.toInt()}.min() ?: 0
 
-	fun maxQual(): Int = qual.map{it.toInt()}.max() ?: 0
+	fun qualsAsPhredScore(delta: Int = 33): List<Int> = this.qual.map { it.toInt() - delta }
 	
-	fun meanQual(): Int = qual.map{it.toInt()}.sum().div(length.toDouble()).toInt()
+	fun minQual(): Int = this.qual.map{it.toInt()}.min() ?: 0
+
+	fun maxQual(): Int = this.qual.map{it.toInt()}.max() ?: 0
+	
+	fun meanQual(): Int = this.qual.map{it.toInt()}.sum().div(length.toDouble()).toInt()
 
 	override fun getLocus(start: Int, end: Int): SeqQual{
 		val nstart = if(start < 1) 1 else start

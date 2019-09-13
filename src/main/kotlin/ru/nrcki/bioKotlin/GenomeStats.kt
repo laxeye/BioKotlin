@@ -1,10 +1,9 @@
 package ru.nrcki.biokotlin
 
-import ru.nrcki.biokotlin.*
 import ru.nrcki.biokotlin.io.Fasta
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.*
 import kotlinx.serialization.Serializable
+import kotlin.system.exitProcess
 
 class GenomeStats(){
 
@@ -29,7 +28,7 @@ class GenomeStats(){
 		val totalN = totalDNA.getNsCount()
 		val contigCount = fastaRecords.size
 
-		val lengths = fastaRecords.map{it.length}.sortedWith(compareBy({-it}))
+		val lengths = fastaRecords.map{it.length}.sortedWith(compareBy {-it})
 		var sum = 0
 		var n50 = 0
 		var n90 = 0
@@ -47,11 +46,10 @@ class GenomeStats(){
 				l90 = lengths.indexOf(it)
 			}
 		}
-		val maxLength = lengths[0]
-		val genomeData = GenomeData(totalLength, contigCount,
-			totalGC, n50, l50, n90, l90, totalN, maxLength)
+		val maxLength = lengths.get(0)
 
-		return genomeData
+		return GenomeData(totalLength, contigCount,
+			totalGC, n50, l50, n90, l90, totalN, maxLength)
 	}
 
 	fun printGenomeStats(genomeData: GenomeData, format: String){
@@ -73,7 +71,7 @@ class GenomeStats(){
 		val fastaRecords = Fasta().read(filename)
 		if(fastaRecords.size == 0){
 			System.err.println("Empty file.")
-			System.exit(1)
+			exitProcess(1)
 		}
 		val genomeData = getStats(fastaRecords)
 		printGenomeStats(genomeData, outMode)
