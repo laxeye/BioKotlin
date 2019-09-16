@@ -1,11 +1,18 @@
 package ru.nrcki.biokotlin
 
 interface BioSequence {
+	abstract val header: String
+	abstract val gaplength: Int
+	abstract val sequence: String
+	abstract val length: Int
+	abstract val id: String
 
+	fun formatted(): String
+	abstract fun getChar(i: Int): Char
 }
 
-open class Sequence(val header: String, val sequence: String): BioSequence {
-	
+open class Sequence(override val header: String, final override val sequence: String): BioSequence {
+
 	fun getGapLength(sequence: String): Int = sequence.count({it == '-'})
 
 	fun getGapShare(sequence: String): Double = sequence.count({it == '-'}).toDouble()
@@ -13,11 +20,11 @@ open class Sequence(val header: String, val sequence: String): BioSequence {
 
 	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter{it != '-'})
 
-	val id: String = header.split(" ").get(0)
+	override val id = this.header.split(" ").get(0)
 
-	val length = sequence.length
+	override val length = sequence.length
 
-	val gaplength: Int
+	override val gaplength: Int
 		get() = getGapLength(sequence)
 
 	fun getGapCount(): Int {
@@ -48,11 +55,11 @@ open class Sequence(val header: String, val sequence: String): BioSequence {
 		return lineList.joinToString(separator="\n",prefix="",postfix="")
 	}
 
-	fun asFasta(): String = ">$header\n${formatFasta(sequence)}"
+	override fun formatted(): String = ">$header\n${formatFasta(sequence)}"
 
 	override fun toString(): String = ">$header\n$sequence"
 
-	open fun getChar(pos: Int): Char = this.sequence.get(pos)
+	override fun getChar(i: Int): Char = this.sequence[i]
 
 	/* 1-based! */
 	open fun getLocus(start: Int, end: Int): Sequence{
@@ -66,9 +73,9 @@ open class Sequence(val header: String, val sequence: String): BioSequence {
 
 }
 
-open class SeqQual(header: String, sequence: String, val qual: String): Sequence(header, sequence){
+class SeqQual(header: String, sequence: String, val qual: String): Sequence(header, sequence){
 	
-	fun asFastq(): String = "@$header\n$sequence\n+\n$qual\n"
+	override fun formatted(): String = "@$header\n$sequence\n+\n$qual\n"
 	
 	fun qualsAsIntList(): List<Int> = qual.map{it.toInt()}
 
@@ -115,7 +122,7 @@ fun Char.complement(): Char{
 class DNA(header: String, sequence: String): Sequence(header, sequence) {
 
 	//Provisionally RNA functionality will be here
-	val _unambiguous = listOf('A','C','G','T','U')
+	private val unambiguous = listOf('A','C','G','T','U')
 	
 	val GCContent: Double 
 		get() = this.sequence.toUpperCase()
@@ -127,7 +134,7 @@ class DNA(header: String, sequence: String): Sequence(header, sequence) {
 		.count({it == 'G'}) - this.sequence.toUpperCase().count({it == 'C'}))
 		.times(1.0).div(this.sequence.toUpperCase().count({(it == 'C') || (it == 'G')}))
 
-	fun getAmbiguous(dna: String): Int = dna.toUpperCase().count({ !( it in _unambiguous ) })
+	fun getAmbiguous(dna: String): Int = dna.toUpperCase().count({ !( it in unambiguous ) })
 
 	//fun getGapLength(dna: String): Int = dna.count({it == '-'})
 	

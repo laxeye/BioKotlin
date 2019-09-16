@@ -1,8 +1,8 @@
 package ru.nrcki.biokotlin
 
-import ru.nrcki.biokotlin.io.Fasta
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import ru.nrcki.biokotlin.io.Fasta
 import kotlin.system.exitProcess
 
 class GenomeStats(){
@@ -20,7 +20,7 @@ class GenomeStats(){
 			.joinToString(separator=", \n", prefix="{", postfix="}")
 	*/
 
-	fun getStats(fastaRecords: List<Sequence>): GenomeData{
+	fun getStats(fastaRecords: List<BioSequence>): GenomeData{
 
 		val totalDNA = fastaRecords.map{it.sequence}.joinToString(separator="")
 		val totalLength = totalDNA.length

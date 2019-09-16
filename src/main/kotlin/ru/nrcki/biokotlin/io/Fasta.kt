@@ -2,60 +2,58 @@ package ru.nrcki.biokotlin.io
 
 import java.io.FileInputStream
 import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
-import java.util.Scanner
 import java.util.zip.GZIPInputStream
 import org.apache.commons.compress.compressors.bzip2.*
+import ru.nrcki.biokotlin.BioSequence
 import ru.nrcki.biokotlin.Sequence
 import ru.nrcki.biokotlin.SeqQual
 
-class Fasta(){
+interface IBioIO {
+	fun read(filename: String): List<BioSequence>
+	fun write(file: String, list: List<BioSequence>)
+}
+
+class Fasta() : IBioIO {
 
 	fun asMultiFasta(recList: List<Sequence>): String{
-		return recList.map{it.asFasta()}.joinToString(separator="\n",prefix="",postfix="")
+		return recList.map{it.formatted()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
-	fun readAuto(filename: String): List<Sequence>{
+	override fun read(filename: String): List<BioSequence>{
 		val suffix = filename.split(".").last()
-		val fasta = when(suffix){
-			"gz" -> readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
-			"bz2" -> readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
-			else -> readBR(FileInputStream(filename).bufferedReader())
-		}
-		return fasta
-	}
-
-
-	fun read(filename: String): List<Sequence>{
-		try {
-			return readBR(FileInputStream(filename).bufferedReader())
-		}
-		catch (e: Exception) {
+		return try {
+			when(suffix){
+				"gz" -> readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
+				"bz2" -> readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
+				else -> readBR(FileInputStream(filename).bufferedReader())
+			}
+		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			return listOf<Sequence>()
+			listOf<Sequence>()
 		}
+
 	}
 
 	fun readGzip(filename: String): List<Sequence>{
-		try {
-			return readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
-		}
-		catch (e: Exception) {
+		return try {
+			readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
+		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			return listOf<Sequence>()
+			listOf<Sequence>()
 		}
 	}
 
 	fun readBzip2(filename: String): List<Sequence>{
-		try {
-			return readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
-		}
-		catch (e: Exception) {
+		return try {
+			readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
+		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			return listOf<Sequence>()
+			listOf<Sequence>()
 		}
 	}
 
@@ -88,9 +86,16 @@ class Fasta(){
 		temporaryList.add(Sequence(id, lineArray.joinToString(separator="")))
 		return temporaryList.toList()
 	}
+
+	override fun write(file: String, list: List<BioSequence>){
+		val bfWriter: BufferedWriter = File(file).bufferedWriter()
+		list.forEach {bfWriter.write(it.formatted())}
+		bfWriter.close()
+	}
+
 }
 
-class Fastq() {
+class Fastq() : IBioIO {
 
 	/* Legacy fastq file reader */
 	/*
@@ -112,28 +117,7 @@ class Fastq() {
 	*/
 
 	fun asMultiFastq(recList: List<SeqQual>): String{
-		return recList.map{it.asFastq()}.joinToString(separator="\n",prefix="",postfix="")
-	}
-
-	fun readSC(sc: Scanner): List<SeqQual>{
-		val temporaryList = mutableListOf<SeqQual>()
-
-		var tmpHead = ""
-		var tmpSeq = ""
-		var i = 0
-
-		while(sc.hasNextLine()){
-			i++
-			val line = sc.nextLine()
-			val field = i.rem(4)
-			when(field){
-				1 -> tmpHead = line.drop(1)
-				2 -> tmpSeq = line
-				0 -> temporaryList.add(SeqQual(tmpHead, tmpSeq, line))
-			}
-		}
-		sc.close()
-		return temporaryList.toList()
+		return recList.map{it.formatted()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
 	fun readBR(br: BufferedReader): MutableList<SeqQual>{
@@ -158,17 +142,7 @@ class Fastq() {
 		return temporaryList
 	}
 
-	fun readAutoSC(filename: String): List<SeqQual>{
-		val suffix = filename.split(".").last()
-		val sc = when(suffix){
-			"gz" -> Scanner(GZIPInputStream(FileInputStream(filename))) 
-			"bz2" -> Scanner(BZip2CompressorInputStream(FileInputStream(filename)))
-			else -> Scanner(FileInputStream(filename))
-		}
-		return readSC(sc)
-	}
-
-	fun readAutoBR(filename: String): List<SeqQual>{
+	override fun read(filename: String): List<BioSequence>{
 		val suffix = filename.split(".").last()
 		val br = when(suffix){
 			"gz" -> GZIPInputStream(FileInputStream(filename)).bufferedReader()
@@ -180,26 +154,17 @@ class Fastq() {
 
 
 	fun fastqPairing(file1: String, file2: String){
-		val readsIdR = Fastq().readAutoBR(file2).map{it.id}
-		System.err.println("Forward IDs loaded.")
-		var readsF = Fastq().readAutoBR(file1)
-		System.err.println("Secondfile red.")
+		val readsIdR = Fastq().read(file2).map{it.id}
+		val readsF = Fastq().read(file1)
 		val bothID = readsF.map{it.id}.intersect(readsIdR)
-		System.err.println("Intersection ready.")
-		val bfWriterF = File("paired.$file1").bufferedWriter()
-		readsF.filter{it.id in bothID}.sortedBy{it.id}.forEach{
-			bfWriterF.write(it.asFastq())
-		}
-		//readsF = mutableListOf<Fastq.Record>("")
-		//readsF.clear()
-		bfWriterF.close()
+		write("paired.$file1", readsF.filter{it.id in bothID}.sortedBy{it.id})
+		write("paired.$file2", Fastq().read(file2).filter{it.id in bothID}.sortedBy{it.id})
+	}
 
-		val bfWriterR = File("paired.$file2").bufferedWriter()
-		Fastq().readAutoBR(file2).filter{it.id in bothID}.sortedBy{it.id}.forEach{
-			bfWriterR.write(it.asFastq())
-		}
-		bfWriterR.close()
-
+	override fun write(file: String, list: List<BioSequence>){
+		val bfWriter: BufferedWriter = File(file).bufferedWriter()
+		list.forEach {bfWriter.write(it.formatted())}
+		bfWriter.close()
 	}
 
 

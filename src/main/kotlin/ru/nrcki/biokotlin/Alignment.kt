@@ -1,10 +1,8 @@
 package ru.nrcki.biokotlin
 
-import ru.nrcki.biokotlin.Sequence
-
 class Alignment(){
 
-	fun getAlnCols(aln: List<Sequence>): List<String>{
+	fun getAlnCols(aln: List<BioSequence>): List<String>{
 		val mList = mutableListOf<String>()
 		val length = aln[0].length
 		for(i in 0 until length){
@@ -21,12 +19,12 @@ class Alignment(){
 		}
 	}
 		
-	fun getGapLength(aln: List<Sequence>): Int = aln.map(){it.gaplength}.sum()
+	fun getGapLength(aln: List<BioSequence>): Int = aln.map(){it.gaplength}.sum()
 
-	fun getGapShare(aln: List<Sequence>): Double = getGapLength(aln)
+	fun getGapShare(aln: List<BioSequence>): Double = getGapLength(aln)
 		.times(1.0).div(aln[0].length * aln.size)
 
-	fun printAlnInfo(aln: List<Sequence>) {
+	fun printAlnInfo(aln: List<BioSequence>) {
 		val valid = checkLength(aln)
 		val gapShare = getGapShare(aln)
 		val size = aln.size
@@ -36,12 +34,12 @@ class Alignment(){
 		println("Share of gaps in alignment: $gapShare.")
 	}
 
-	fun checkLength(aln: List<Sequence>): Boolean {
+	fun checkLength(aln: List<BioSequence>): Boolean {
 		return aln.filter(){it.length != aln[0].length}.size == 0
 	}
 
 	// Sequential PHYLIP alignment format
-	fun asPhylipSeq(aln: List<Sequence>, strict: Boolean = true): String{
+	fun asPhylipSeq(aln: List<BioSequence>, strict: Boolean = true): String{
 		
 		// Strict mode (ID length eq 9) may produce duplicating IDs
 		val tmpPhylip = mutableListOf<String>("${aln.size} ${aln[0].length}")
@@ -56,10 +54,10 @@ class Alignment(){
 		return tmpPhylip.joinToString(separator = "\n")
 	}
 
-	fun clearGappedColumns(aln: List<Sequence>, maxGapShare: Double = 0.5): List<Sequence> {
+	fun clearGappedColumns(aln: List<BioSequence>, maxGapShare: Double = 0.5): List<BioSequence> {
 		val alnColumns = getAlnCols(aln)
 		val cleanColumns = alnColumns.filter(){(it.count({it == '-'}).toDouble() / it.length.toDouble()) < maxGapShare}
-		val cleanedFasta = mutableListOf<Sequence>()
+		val cleanedFasta = mutableListOf<BioSequence>()
 		for(i in 0 until aln.size){
 			cleanedFasta.add(Sequence(aln[i].header, cleanColumns.map(){it.get(i)}.joinToString("")))
 		}

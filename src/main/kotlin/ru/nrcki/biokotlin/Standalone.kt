@@ -1,7 +1,7 @@
 package ru.nrcki.biokotlin
 
-import ru.nrcki.biokotlin.*
-import ru.nrcki.biokotlin.io.*
+import ru.nrcki.biokotlin.io.Fasta
+import ru.nrcki.biokotlin.io.Fastq
 import java.io.File
 
 fun main(args: Array<String>){
@@ -30,18 +30,18 @@ fun main(args: Array<String>){
 			Alignment().clearGappedColumns(Fasta().read(args[1]),gapShare).map{println(it.toString())}
 		}
 		"FilterShortSeqsFasta" -> {
-			Fasta().readAuto(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.asFasta())}
+			Fasta().read(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.formatted())}
 		}
 		"FilterShortSeqsFastq" -> {
-			Fastq().readAutoBR(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.asFastq())}
+			Fastq().read(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.formatted())}
 		}
 		"RemoveByName" -> {
 			val removeList = File(args[2]).readLines()
-			Fasta().readAuto(args[1]).filter(){ ! (it.id in removeList) }.map{println(it.asFasta())}
+			Fasta().read(args[1]).filter(){ ! (it.id in removeList) }.map{println(it.formatted())}
 		}
 		"ExtractByName" -> {
 			val extractList = File(args[2]).readLines()
-			Fasta().readAuto(args[1]).filter(){ it.id in extractList }.map{println(it.asFasta())}
+			Fasta().read(args[1]).filter(){ it.id in extractList }.map{println(it.formatted())}
 		}
 		"FastaToSeqPhylip" -> {
 			if((args.size > 2) && (args[2].toString() == "nostrict")){
