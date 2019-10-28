@@ -62,42 +62,21 @@ class AppTest {
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
-/*
-	@Test fun `Read Fastq from file with Scanner`() {
-		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq")[0].asFastq(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
-				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
-				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
-	}
-*/
+
 	@Test fun `Read Fastq from gzip file with BufferedReader`() {
 		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq.gz")[0].formatted(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
-/*
-	@Test fun `Read Fastq from gzip file with Scanner`() {
-		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.gz")[0].asFastq(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
-				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
-				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
-	}
-*/
+
 	@Test fun `Read Fastq from bzip2 file with BufferedReader`() {
 		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq.bz2")[0].formatted(),
 			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
-/*
-	@Test fun `Read Fastq from bzip2 file with Scanner`() {
-		assertEquals(Fastq().readAutoSC("src/test/resources/SRR030257_1.head.fq.bz2")[0].asFastq(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
-				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
-				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").asFastq())
-	}
-*/
+
 	@Test fun `check GC content String method`() {
 		assertEquals(0.5, "ACGT".getGCContent() )
 	}

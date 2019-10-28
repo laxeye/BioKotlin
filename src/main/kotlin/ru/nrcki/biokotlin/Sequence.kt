@@ -1,26 +1,28 @@
 package ru.nrcki.biokotlin
 
+import kotlin.math.round
+
 interface BioSequence {
-	abstract val header: String
-	abstract val gaplength: Int
-	abstract val sequence: String
-	abstract val length: Int
-	abstract val id: String
+	val header: String
+	val gaplength: Int
+	val sequence: String
+	val length: Int
+	val id: String
 
 	fun formatted(): String
-	abstract fun getChar(i: Int): Char
+	fun getChar(i: Int): Char
 }
 
-open class Sequence(override val header: String, final override val sequence: String): BioSequence {
+open class Sequence(final override val header: String, final override val sequence: String): BioSequence {
 
-	fun getGapLength(sequence: String): Int = sequence.count({it == '-'})
+	fun getGapLength(sequence: String): Int = sequence.count {it == '-'}
 
-	fun getGapShare(sequence: String): Double = sequence.count({it == '-'}).toDouble()
+	fun getGapShare(sequence: String): Double = sequence.count {it == '-'}.toDouble()
 		.div(sequence.length)
 
-	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter{it != '-'})
+	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter {it != '-'})
 
-	override val id = this.header.split(" ").get(0)
+	override val id = this.header.split(" ")[0]
 
 	override val length = sequence.length
 
@@ -38,17 +40,17 @@ open class Sequence(override val header: String, final override val sequence: St
 	}
 
 	val xcount: Int 
-		get() = sequence.toUpperCase().count({it == 'X'})
+		get() = sequence.toUpperCase().count {it == 'X'}
 
 	val ncount: Int
-		get() = sequence.toUpperCase().count({it == 'N'})
+		get() = sequence.toUpperCase().count {it == 'N'}
 
 	private val _width = 60
 
 	fun formatFasta(seq: String, w: Int = _width): String{
 		val lineList = mutableListOf<String>()
 		val steps = seq.length.div(w)
-		for (i in 0..steps-1){
+		for (i in 0 until steps){
 			lineList.add(seq.substring(w*i,w*(i+1)))
 		}
 		lineList.add(seq.substring(w*steps))
@@ -80,12 +82,17 @@ class SeqQual(header: String, sequence: String, val qual: String): Sequence(head
 	fun qualsAsIntList(): List<Int> = qual.map{it.toInt()}
 
 	fun qualsAsPhredScore(delta: Int = 33): List<Int> = this.qual.map { it.toInt() - delta }
-	
-	fun minQual(): Int = this.qual.map{it.toInt()}.min() ?: 0
 
-	fun maxQual(): Int = this.qual.map{it.toInt()}.max() ?: 0
+	val phredScoreList
+		get() = this.qualsAsPhredScore()
 	
-	fun meanQual(): Int = this.qual.map{it.toInt()}.sum().div(length.toDouble()).toInt()
+	fun minQual(): Int = phredScoreList.min() ?: 0
+
+	fun maxQual(): Int = phredScoreList.max() ?: 0
+	
+	fun meanQual(): Int = round(phredScoreList.sum().toDouble().div(length)).toInt()
+
+	fun medianQual(): Int = phredScoreList.map{it.toInt()}.sum().div(length.toDouble()).toInt()
 
 	override fun getLocus(start: Int, end: Int): SeqQual{
 		val nstart = if(start < 1) 1 else start
@@ -103,68 +110,71 @@ class SeqQual(header: String, sequence: String, val qual: String): Sequence(head
 fun String.removeGaps(): String = this.filter{it != '-'}
 
 fun String.getGCContent(): Double = this.toUpperCase()
-	.count({(it == 'C') || (it == 'G')}).times(1.0).div(this.length)
+	.count {(it == 'C') || (it == 'G')} .toDouble().div(this.length)
 
-fun String.getNsCount(): Int = this.toUpperCase().count({it == 'N'})
+fun String.getNsCount(): Int = this.toUpperCase().count {it == 'N'}
 
 fun String.revComp(): String = this.reversed().map { it.complement() } .joinToString("")
 
 fun Char.complement(): Char{
-		when(this.toUpperCase()) {
-			'A' -> return 'T'
-			'C' -> return 'G'
-			'G' -> return 'C'
-			'T' -> return 'A'
-			else -> return 'N'
-		}
+	return when(this.toUpperCase()) {
+		'A' -> 'T'
+		'C' -> 'G'
+		'G' -> 'C'
+		'T' -> 'A'
+		else -> 'N'
+	}
 	}
 
 class DNA(header: String, sequence: String): Sequence(header, sequence) {
 
 	//Provisionally RNA functionality will be here
-	private val unambiguous = listOf('A','C','G','T','U')
-	
+	private val unambiguous = listOf('A','C','G','T')
+
+	val baseCount: Map<Char,Int>
+		get() = mapOf(Pair('A', this.sequence.toUpperCase().count{it == 'A'}),
+			Pair('C', this.sequence.toUpperCase().count{it == 'C'}),
+			Pair('G', this.sequence.toUpperCase().count{it == 'G'}),
+			Pair('T', this.sequence.toUpperCase().count{it == 'T'})
+		)
+
 	val GCContent: Double 
-		get() = this.sequence.toUpperCase()
-		.count({(it == 'C') || (it == 'G')}).times(1.0).div(this.length)
+		get() = (( baseCount['C'] ?: 0 ) + (baseCount['G'] ?: 0) ).toDouble().div(this.length)
 
-	// GCskew = (G - C) / (G + C)
+	/* GC skew = (G - C) / (G + C) */
 	val GCSkew: Double
-		get() = (this.sequence.toUpperCase()
-		.count({it == 'G'}) - this.sequence.toUpperCase().count({it == 'C'}))
-		.times(1.0).div(this.sequence.toUpperCase().count({(it == 'C') || (it == 'G')}))
+		get() = ( (baseCount['G'] ?: 0) - (baseCount['G'] ?: 0) ).toDouble()
+			.div( (baseCount['G'] ?: 0) + (baseCount['G'] ?: 0) )
 
-	fun getAmbiguous(dna: String): Int = dna.toUpperCase().count({ !( it in unambiguous ) })
+	fun getAmbiguousCount(dna: String): Int = dna.toUpperCase().count { it !in unambiguous }
 
-	//fun getGapLength(dna: String): Int = dna.count({it == '-'})
-	
-	fun revComp(seq: String): String = seq.reversed().map { it.complement() } .joinToString("")
+	fun revComp(): String = this.sequence.reversed().map { it.complement() } .joinToString("")
 
-	fun ACGTtoACGU(nucl: Char): Char {
-		when(nucl.toUpperCase()) {
-			'A' -> return 'A'
-			'C' -> return 'C'
-			'G' -> return 'G'
-			'T' -> return 'U'
-			else -> return 'N'
+	fun convertACGTtoACGU(nucl: Char): Char {
+		return when(nucl.toUpperCase()) {
+			'A' -> 'A'
+			'C' -> 'C'
+			'G' -> 'G'
+			'T' -> 'U'
+			else -> 'N'
 		}
 	}
 
-	fun toRNA(): String = this.sequence.map { ACGTtoACGU(it) } .joinToString("")
+	fun toRNA(): String = this.sequence.map { convertACGTtoACGU(it) } .joinToString("")
 	
 }
 
 class RNA(header: String, sequence: String): Sequence(header, sequence){
 
-	fun toDNA(seq: String): String = seq.map { ACGUtoACGT(it) } .joinToString("")
+	fun toDNA(seq: String): String = seq.map { convertACGUtoACGT(it) } .joinToString("")
 
-	fun ACGUtoACGT(nucl: Char): Char {
-		when(nucl.toUpperCase()) {
-			'A' -> return 'A'
-			'C' -> return 'C'
-			'G' -> return 'G'
-			'U' -> return 'T'
-			else -> return 'N'
+	fun convertACGUtoACGT(nucl: Char): Char {
+		return when(nucl.toUpperCase()) {
+			'A' -> 'A'
+			'C' -> 'C'
+			'G' -> 'G'
+			'U' -> 'T'
+			else -> 'N'
 		}
 	}
 
@@ -172,7 +182,7 @@ class RNA(header: String, sequence: String): Sequence(header, sequence){
 
 class Protein(header: String, sequence: String): Sequence(header, sequence) {
 
-	fun getAmbiguous(aa: String): Int = aa.toUpperCase().count({it == 'X'})
+	fun getAmbiguous(aa: String): Int = aa.toUpperCase().count {it == 'X'}
 
 	//fun getGapLength(dna: String): Int = dna.count({it == '-'})
 

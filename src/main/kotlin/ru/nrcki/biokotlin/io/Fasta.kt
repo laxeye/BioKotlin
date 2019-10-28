@@ -1,18 +1,18 @@
 package ru.nrcki.biokotlin.io
 
-import java.io.FileInputStream
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
+import ru.nrcki.biokotlin.BioSequence
+import ru.nrcki.biokotlin.SeqQual
+import ru.nrcki.biokotlin.Sequence
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
+import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
-import org.apache.commons.compress.compressors.bzip2.*
-import ru.nrcki.biokotlin.BioSequence
-import ru.nrcki.biokotlin.Sequence
-import ru.nrcki.biokotlin.SeqQual
 
 interface IBioIO {
 	fun read(filename: String): List<BioSequence>
-	fun write(file: String, list: List<BioSequence>)
+	fun write(filename: String, list: List<BioSequence>)
 }
 
 class Fasta() : IBioIO {
@@ -87,8 +87,8 @@ class Fasta() : IBioIO {
 		return temporaryList.toList()
 	}
 
-	override fun write(file: String, list: List<BioSequence>){
-		val bfWriter: BufferedWriter = File(file).bufferedWriter()
+	override fun write(filename: String, list: List<BioSequence>){
+		val bfWriter: BufferedWriter = File(filename).bufferedWriter()
 		list.forEach {bfWriter.write(it.formatted())}
 		bfWriter.close()
 	}
@@ -130,8 +130,7 @@ class Fastq() : IBioIO {
 		
 		while(line != null){
 			i++
-			val field = i.rem(4)
-			when(field){
+			when(i.rem(4)){
 				1 -> tmpHead = line.drop(1)
 				2 -> tmpSeq = line
 				0 -> temporaryList.add(SeqQual(tmpHead, tmpSeq, line))
@@ -161,8 +160,8 @@ class Fastq() : IBioIO {
 		write("paired.$file2", Fastq().read(file2).filter{it.id in bothID}.sortedBy{it.id})
 	}
 
-	override fun write(file: String, list: List<BioSequence>){
-		val bfWriter: BufferedWriter = File(file).bufferedWriter()
+	override fun write(filename: String, list: List<BioSequence>){
+		val bfWriter: BufferedWriter = File(filename).bufferedWriter()
 		list.forEach {bfWriter.write(it.formatted())}
 		bfWriter.close()
 	}

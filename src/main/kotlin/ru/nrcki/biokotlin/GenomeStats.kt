@@ -46,7 +46,7 @@ class GenomeStats(){
 				l90 = lengths.indexOf(it)
 			}
 		}
-		val maxLength = lengths.get(0)
+		val maxLength = lengths[0]
 
 		return GenomeData(totalLength, contigCount,
 			totalGC, n50, l50, n90, l90, totalN, maxLength)

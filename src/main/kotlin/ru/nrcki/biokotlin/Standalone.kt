@@ -30,21 +30,21 @@ fun main(args: Array<String>){
 			Alignment().clearGappedColumns(Fasta().read(args[1]),gapShare).map{println(it.toString())}
 		}
 		"FilterShortSeqsFasta" -> {
-			Fasta().read(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.formatted())}
+			Fasta().read(args[1]).filter{it.length>=args[2].toInt()}.map{println(it.formatted())}
 		}
 		"FilterShortSeqsFastq" -> {
-			Fastq().read(args[1]).filter(){it.length>=args[2].toInt()}.map{println(it.formatted())}
+			Fastq().read(args[1]).filter{it.length>=args[2].toInt()}.map{println(it.formatted())}
 		}
 		"RemoveByName" -> {
 			val removeList = File(args[2]).readLines()
-			Fasta().read(args[1]).filter(){ ! (it.id in removeList) }.map{println(it.formatted())}
+			Fasta().read(args[1]).filter{ it.id !in removeList }.map{println(it.formatted())}
 		}
 		"ExtractByName" -> {
 			val extractList = File(args[2]).readLines()
-			Fasta().read(args[1]).filter(){ it.id in extractList }.map{println(it.formatted())}
+			Fasta().read(args[1]).filter{ it.id in extractList }.map{println(it.formatted())}
 		}
 		"FastaToSeqPhylip" -> {
-			if((args.size > 2) && (args[2].toString() == "nostrict")){
+			if((args.size > 2) && (args[2] == "nostrict")){
 				println(Alignment().asPhylipSeq(Fasta().read(args[1]), false))
 			}else{
 				println(Alignment().asPhylipSeq(Fasta().read(args[1])))

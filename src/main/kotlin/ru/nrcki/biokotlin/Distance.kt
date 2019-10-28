@@ -57,7 +57,7 @@ class Distance(){
 	fun jcMeanDistance(alignment: List<BioSequence>, nucl: Boolean = true){
 		alignment.forEach(){querySeq ->
 			print("${querySeq.id}\t")
-			println( alignment.map{jcDistance(querySeq,it,nucl)}.sum().toDouble().div(alignment.size - 1) )
+			println( alignment.map{jcDistance(querySeq,it,nucl)}.sum().div(alignment.size - 1) )
 		}
 	}
 

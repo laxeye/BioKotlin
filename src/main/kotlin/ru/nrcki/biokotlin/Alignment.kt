@@ -13,16 +13,16 @@ class Alignment(){
 	
 	fun getAmbCount(aln: List<Sequence>, type: String) {
 		if((type == "DNA") || (type == "RNA")){
- 			aln.map(){it.ncount}.sum()
+ 			aln.map{it.ncount}.sum()
 		} else {
-			aln.map(){it.xcount}.sum()
+			aln.map{it.xcount}.sum()
 		}
 	}
 		
-	fun getGapLength(aln: List<BioSequence>): Int = aln.map(){it.gaplength}.sum()
+	fun getGapLength(aln: List<BioSequence>): Int = aln.map{it.gaplength}.sum()
 
 	fun getGapShare(aln: List<BioSequence>): Double = getGapLength(aln)
-		.times(1.0).div(aln[0].length * aln.size)
+		.toDouble().div(aln[0].length * aln.size)
 
 	fun printAlnInfo(aln: List<BioSequence>) {
 		val valid = checkLength(aln)
@@ -34,9 +34,7 @@ class Alignment(){
 		println("Share of gaps in alignment: $gapShare.")
 	}
 
-	fun checkLength(aln: List<BioSequence>): Boolean {
-		return aln.filter(){it.length != aln[0].length}.size == 0
-	}
+	fun checkLength(aln: List<BioSequence>): Boolean = aln.filter{it.length != aln[0].length}.size == 0
 
 	// Sequential PHYLIP alignment format
 	fun asPhylipSeq(aln: List<BioSequence>, strict: Boolean = true): String{
@@ -56,10 +54,10 @@ class Alignment(){
 
 	fun clearGappedColumns(aln: List<BioSequence>, maxGapShare: Double = 0.5): List<BioSequence> {
 		val alnColumns = getAlnCols(aln)
-		val cleanColumns = alnColumns.filter(){(it.count({it == '-'}).toDouble() / it.length.toDouble()) < maxGapShare}
+		val cleanColumns = alnColumns.filter{(it.count {it == '-'}.toDouble() / it.length.toDouble()) < maxGapShare}
 		val cleanedFasta = mutableListOf<BioSequence>()
-		for(i in 0 until aln.size){
-			cleanedFasta.add(Sequence(aln[i].header, cleanColumns.map(){it.get(i)}.joinToString("")))
+		for(i in aln.indices){
+			cleanedFasta.add(Sequence(aln[i].header, cleanColumns.map{it.get(i)}.joinToString("")))
 		}
 		
 		return cleanedFasta.toList()

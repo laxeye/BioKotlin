@@ -1,7 +1,6 @@
 package ru.nrcki.biokotlin
 
 import ru.nrcki.biokotlin.io.Fasta
-import ru.nrcki.biokotlin.DNA
 
 class Tetra(){
 
@@ -29,23 +28,23 @@ class Tetra(){
 
 	fun calcTetra(seq: String): Map<String,Int>{
 		val tetraList = makeTetraList()
-		val tMap =  tetraList.associate{ it to 0 }.toMutableMap<String,Int>()
+		val tMap =  tetraList.associateWith { 0 }.toMutableMap<String,Int>()
 		val lastIdx = seq.length - 4
 		for(i in 0..lastIdx){
 			var piece = seq.substring(i,i+4)
-			if(piece in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
+			if(piece in tetraList) tMap.put(piece, (tMap[piece] ?: 0) + 1)
 			piece = piece.revComp()
-			if(piece.revComp() in tetraList) tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
+			if(piece.revComp() in tetraList) tMap[piece] = (tMap[piece] ?: 0) + 1
 		}
 		return tMap
 	}
 
 	fun calcAllTetra(seq: String): Map<String,Int>{
-		val tMap = makeTetraList(true).associate{ it to 0 }.toMutableMap<String,Int>()
+		val tMap = makeTetraList(true).associateWith { 0 }.toMutableMap<String,Int>()
 		val lastIdx = seq.length - 4
 		for(i in 0..lastIdx){
 			val piece = seq.substring(i,i+4)
-			tMap.put(piece, (tMap.get(piece) ?: 0) + 1)
+			tMap[piece] = (tMap[piece] ?: 0) + 1
 		}
 		return tMap
 	}
