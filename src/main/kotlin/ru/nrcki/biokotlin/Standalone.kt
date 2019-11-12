@@ -6,14 +6,17 @@ import java.io.File
 
 fun main(args: Array<String>){
 	val helpMessage = """
-	BioKotlin could work in standalone mode.
+	BioKotlin works in standalone mode.
 	Next commands are now supported:
 	GenomeStats <File> - output statistics for Fasta file.
+	FastqStats <File> - output statistics for Fastq file.
 	TetraStats <File> - output statistics for Fasta file.
 	AlignmentStats <File> - output statistics for Fasta alignment.
 	AlignmentClearGaps <File> <0-100> - treshold gap share to remove column from alignment.
 	FilterShortSeqsFasta <File> <minimum length> - filter out short sequences FASTA.
 	FilterShortSeqsFastq <File> <minimum length> - filter out short sequences FASTQ.
+	ExtractByName <Fasta> <File with ID> - extract sequences with provided names.
+	RemoveByName <Fasta> <File with ID> - extract all sequences except provided names.
 	FastaToSeqPhylip <File> [nostrict]- convert Fasta alignment to strict sequental Phylip. 
 	When "nostrict" mode used name of sequnces will not be trimmed to 9 symbols.
 	FastqPairing <Forward> <Reverse> - check files for orphaned reads and write sorted.
@@ -50,6 +53,12 @@ fun main(args: Array<String>){
 				println(Alignment().asPhylipSeq(Fasta().read(args[1])))
 			}
 		}
+		"FastqToFasta"		-> {
+			val infile = args[1]
+			val outfile = Regex("""\.fq*|\.fastq*""").replace(infile, ".fasta")
+			Fasta().write(outfile, Fastq().read(infile).map{ BioSequence(it.header, it.sequence) } )
+		}
+        "FastqStats"        -> fastqStats(args[1])
 		"FastqPairing" 		-> Fastq().fastqPairing(args[1],args[2])
 		"DistMatNuclJC" 	-> Distance().jcMatrix(Fasta().read(args[1]),true)
 		"DistMatProtJC" 	-> Distance().jcMatrix(Fasta().read(args[1]),false)
@@ -57,4 +66,14 @@ fun main(args: Array<String>){
 		else -> System.err.print(helpMessage)
 	}
 
+}
+
+fun fastqStats(filename: String){
+    val reads = Fastq().read(filename)
+    val count = reads.size
+    val meanLength = reads.map{it.length}.sum().div(count)
+    val meanQual = reads.map{it.meanQual()}.sum().div(count)
+    println("Read count: $count")
+    println("Mean length $meanLength")
+    println("Mean quality $meanQual")
 }

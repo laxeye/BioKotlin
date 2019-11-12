@@ -20,7 +20,7 @@ class GenomeStats(){
 			.joinToString(separator=", \n", prefix="{", postfix="}")
 	*/
 
-	fun getStats(fastaRecords: List<BioSequence>): GenomeData{
+	fun getStats(fastaRecords: List<IBioSequence>): GenomeData{
 
 		val totalDNA = fastaRecords.map{it.sequence}.joinToString(separator="")
 		val totalLength = totalDNA.length

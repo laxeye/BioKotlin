@@ -1,9 +1,9 @@
 package ru.nrcki.biokotlin.io
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
+import ru.nrcki.biokotlin.IBioSequence
+import ru.nrcki.biokotlin.BioSeqQual
 import ru.nrcki.biokotlin.BioSequence
-import ru.nrcki.biokotlin.SeqQual
-import ru.nrcki.biokotlin.Sequence
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -11,17 +11,17 @@ import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
 
 interface IBioIO {
-	fun read(filename: String): List<BioSequence>
-	fun write(filename: String, list: List<BioSequence>)
+	fun read(filename: String): List<IBioSequence>
+	fun write(filename: String, list: List<IBioSequence>)
 }
 
 class Fasta() : IBioIO {
 
-	fun asMultiFasta(recList: List<Sequence>): String{
+	fun asMultiFasta(recList: List<BioSequence>): String{
 		return recList.map{it.formatted()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
-	override fun read(filename: String): List<BioSequence>{
+	override fun read(filename: String): List<IBioSequence>{
 		val suffix = filename.split(".").last()
 		return try {
 			when(suffix){
@@ -32,33 +32,33 @@ class Fasta() : IBioIO {
 		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			listOf<Sequence>()
+			listOf<BioSequence>()
 		}
 
 	}
 
-	fun readGzip(filename: String): List<Sequence>{
+	fun readGzip(filename: String): List<BioSequence>{
 		return try {
 			readBR(GZIPInputStream(FileInputStream(filename)).bufferedReader())
 		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			listOf<Sequence>()
+			listOf<BioSequence>()
 		}
 	}
 
-	fun readBzip2(filename: String): List<Sequence>{
+	fun readBzip2(filename: String): List<BioSequence>{
 		return try {
 			readBR(BZip2CompressorInputStream(FileInputStream(filename)).bufferedReader())
 		} catch (e: Exception) {
 			System.err.println(e)
 			System.exit(1)
-			listOf<Sequence>()
+			listOf<BioSequence>()
 		}
 	}
 
-	fun readBR(br: BufferedReader): List<Sequence>{
-		val temporaryList = mutableListOf<Sequence>()
+	fun readBR(br: BufferedReader): List<BioSequence>{
+		val temporaryList = mutableListOf<BioSequence>()
 		val seqFile = br.readLines()
 		br.close()
 		if(seqFile.size == 0){
@@ -74,7 +74,7 @@ class Fasta() : IBioIO {
 					seq = lineArray.joinToString(separator="")
 					lineArray = mutableListOf<String>()
 					if (seq.length > 0){
-						temporaryList.add(Sequence(id, seq))
+						temporaryList.add(BioSequence(id, seq))
 					}
 					id = line.drop(1)
 				}else{
@@ -83,11 +83,11 @@ class Fasta() : IBioIO {
 			}
 		}
 
-		temporaryList.add(Sequence(id, lineArray.joinToString(separator="")))
+		temporaryList.add(BioSequence(id, lineArray.joinToString(separator="")))
 		return temporaryList.toList()
 	}
 
-	override fun write(filename: String, list: List<BioSequence>){
+	override fun write(filename: String, list: List<IBioSequence>){
 		val bfWriter: BufferedWriter = File(filename).bufferedWriter()
 		list.forEach {bfWriter.write(it.formatted())}
 		bfWriter.close()
@@ -116,12 +116,12 @@ class Fastq() : IBioIO {
 	}
 	*/
 
-	fun asMultiFastq(recList: List<SeqQual>): String{
+	fun asMultiFastq(recList: List<BioSeqQual>): String{
 		return recList.map{it.formatted()}.joinToString(separator="\n",prefix="",postfix="")
 	}
 
-	fun readBR(br: BufferedReader): MutableList<SeqQual>{
-		val temporaryList = mutableListOf<SeqQual>()
+	fun readBR(br: BufferedReader): MutableList<BioSeqQual>{
+		val temporaryList = mutableListOf<BioSeqQual>()
 
 		var tmpHead = ""
 		var tmpSeq = ""
@@ -133,7 +133,7 @@ class Fastq() : IBioIO {
 			when(i.rem(4)){
 				1 -> tmpHead = line.drop(1)
 				2 -> tmpSeq = line
-				0 -> temporaryList.add(SeqQual(tmpHead, tmpSeq, line))
+				0 -> temporaryList.add(BioSeqQual(tmpHead, tmpSeq, line))
 			}
 			line = br.readLine()
 		}
@@ -141,7 +141,7 @@ class Fastq() : IBioIO {
 		return temporaryList
 	}
 
-	override fun read(filename: String): List<BioSequence>{
+	override fun read(filename: String): List<BioSeqQual>{
 		val suffix = filename.split(".").last()
 		val br = when(suffix){
 			"gz" -> GZIPInputStream(FileInputStream(filename)).bufferedReader()
@@ -160,7 +160,7 @@ class Fastq() : IBioIO {
 		write("paired.$file2", Fastq().read(file2).filter{it.id in bothID}.sortedBy{it.id})
 	}
 
-	override fun write(filename: String, list: List<BioSequence>){
+	override fun write(filename: String, list: List<IBioSequence>){
 		val bfWriter: BufferedWriter = File(filename).bufferedWriter()
 		list.forEach {bfWriter.write(it.formatted())}
 		bfWriter.close()

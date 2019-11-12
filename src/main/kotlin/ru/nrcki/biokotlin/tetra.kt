@@ -32,9 +32,9 @@ class Tetra(){
 		val lastIdx = seq.length - 4
 		for(i in 0..lastIdx){
 			var piece = seq.substring(i,i+4)
-			if(piece in tetraList) tMap.put(piece, (tMap[piece] ?: 0) + 1)
+			if(piece in tetraList) tMap[piece] = (tMap[piece] ?: 0) + 1
 			piece = piece.revComp()
-			if(piece.revComp() in tetraList) tMap[piece] = (tMap[piece] ?: 0) + 1
+			if(piece in tetraList) tMap[piece] = (tMap[piece] ?: 0) + 1
 		}
 		return tMap
 	}

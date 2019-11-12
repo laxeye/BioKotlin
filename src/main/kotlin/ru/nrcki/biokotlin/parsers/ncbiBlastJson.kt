@@ -3,9 +3,8 @@ package ru.nrcki.biokotlin
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
-import java.io.*
+import java.io.File
 
 // Classes for serialization
 
@@ -27,7 +26,7 @@ data class Results(val bl2seq: List<Bl2seq>)
 data class Bl2seq(val query_id: String,
 val query_title: String,
 val query_len: Int,
-@Optional val query_masking: List<QueryMasking>? = null,
+val query_masking: List<QueryMasking>? = null,
 val hits: List<Hit>,
 val stat: Stat)
 

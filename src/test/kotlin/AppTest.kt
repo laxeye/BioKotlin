@@ -12,67 +12,67 @@ class AppTest {
 	}
 
 	@Test fun `Sequence length`() {
-		assertEquals(4,Sequence("ID","GCAT").length)
+		assertEquals(4,BioSequence("ID","GCAT").length)
 	}
 
 	@Test fun `Sequence id`() {
-		assertEquals("ID",Sequence("ID [Taxon]","GCAT").id)
+		assertEquals("ID",BioSequence("ID [Taxon]","GCAT").id)
 	}
 
 	@Test fun `Sequence header`() {
-		assertEquals("ID [Taxon]",Sequence("ID [Taxon]","GCAT").header)
+		assertEquals("ID [Taxon]",BioSequence("ID [Taxon]","GCAT").header)
 	}
 
 	@Test fun `Sequence sequence`() {
-		assertEquals("GCAT",Sequence("ID","GCAT").sequence)
+		assertEquals("GCAT",BioSequence("ID","GCAT").sequence)
 	}
 
 	@Test fun `Stringify Fastq with asFastq`() {
-		assertEquals("@ID\nGCAT\n+\nFFFF\n",SeqQual("ID","GCAT","FFFF").formatted())
+		assertEquals("@ID\nGCAT\n+\nFFFF\n",BioSeqQual("ID","GCAT","FFFF").formatted())
 	}
 
 	@Test fun `Stringify Fasta with asFasta`() {
-		assertEquals(">ID\nGCAT",Sequence("ID","GCAT").formatted())
+		assertEquals(">ID\nGCAT",BioSequence("ID","GCAT").formatted())
 	}
 
 	@Test fun `Read Fasta from File with BufferedReader`() {
 		assertEquals(Fasta().read("src/test/resources/antiTGFPv1M13F.fasta")[0].formatted(),
-			Sequence("antiTGFPv1M13F",
+			BioSequence("antiTGFPv1M13F",
 				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
 			.formatted())
 	}
 
 	@Test fun `Read gzipped Fasta from File with BufferedReader`() {
 		assertEquals(Fasta().readGzip("src/test/resources/antiTGFPv1M13F.fasta.gz")[0].formatted(),
-			Sequence("antiTGFPv1M13F",
+			BioSequence("antiTGFPv1M13F",
 				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
 			.formatted())
 	}
 
 	@Test fun `Read bzipped Fasta from File with BufferedReader`() {
 		assertEquals(Fasta().readBzip2("src/test/resources/antiTGFPv1M13F.fasta.bz2")[0].formatted(),
-			Sequence("antiTGFPv1M13F",
+			BioSequence("antiTGFPv1M13F",
 				"AGGCGGATCGATCCAAGGTCGGGCAGGAAGAGGGCCTATTTCCCATGATTCCTTCATATTTGCATATACGATACAAGGCTGTTAGAGAGATAATTGGAATTAATTTGACTGTAAACACAAAGATATTAGTACAAAATACGTGACGTAGAAAGTAATAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGCTGCACGCCATCAACAACGGGTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTTTCTCCGCTGAGCGTACTGAGACGCCGCGGTGGAGCTCCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGC")
 			.formatted())
 	}
 
 	@Test fun `Read Fastq from file with BufferedReader`() {
 		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq")[0].formatted(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+			BioSeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
 
 	@Test fun `Read Fastq from gzip file with BufferedReader`() {
 		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq.gz")[0].formatted(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+			BioSeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
 
 	@Test fun `Read Fastq from bzip2 file with BufferedReader`() {
 		assertEquals(Fastq().read("src/test/resources/SRR030257_1.head.fq.bz2")[0].formatted(),
-			SeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
+			BioSeqQual("SRR030257.1 HWI-EAS_4_PE-FC20GCB:6:1:385:567/1",
 				"TTACACTCCTGTTAATCCATACAGCAACAGTATTGG",
 				"AAA;A;AA?A?AAAAA?;?A?1A;;????566)=*1").formatted())
 	}
@@ -95,15 +95,15 @@ class AppTest {
 	}
 
 	@Test fun `total gap length in sequence`() {
-		assertEquals(4, Sequence("ID","G--C-A-T").gaplength)
+		assertEquals(4, BioSequence("ID","G--C-A-T").gaplength)
 	}
 	
 	@Test fun `remove gaps from sequence String method`() {
-		assertEquals( "GCAT", Sequence("","G--C-A-T").sequence.removeGaps() )
+		assertEquals( "GCAT", BioSequence("","G--C-A-T").sequence.removeGaps() )
 	}
 	
 	@Test fun `remove gaps from sequence Sequence method`() {
-		assertEquals( "GCAT", Sequence("","G--C-A-T").removeGaps().sequence )
+		assertEquals( "GCAT", BioSequence("","G--C-A-T").removeGaps().sequence )
 	}
 	
 	@Test fun `Convert Fasta to Phylip`(){
@@ -112,11 +112,11 @@ class AppTest {
 	}
 
 	@Test fun `Raw distance`(){
-		assertEquals(0.0, Distance().rawDistance(Sequence("ID","-ACG"),Sequence("ID","-ACG")))
+		assertEquals(0.0, Distance().rawDistance(BioSequence("ID","-ACG"),BioSequence("ID","-ACG")))
 	}
 
 	@Test fun `Jukes-Cantor distance`(){
-		assertEquals(0.0, abs( Distance().jcDistance( Sequence("ID","TACG"), Sequence("ID","TACG") ) ) )
+		assertEquals(0.0, abs( Distance().jcDistance( BioSequence("ID","TACG"), BioSequence("ID","TACG") ) ) )
 	}
 
 

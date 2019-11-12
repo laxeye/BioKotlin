@@ -2,7 +2,7 @@ package ru.nrcki.biokotlin
 
 import kotlin.math.round
 
-interface BioSequence {
+interface IBioSequence {
 	val header: String
 	val gaplength: Int
 	val sequence: String
@@ -13,21 +13,20 @@ interface BioSequence {
 	fun getChar(i: Int): Char
 }
 
-open class Sequence(final override val header: String, final override val sequence: String): BioSequence {
+open class BioSequence(final override val header: String, final override val sequence: String): IBioSequence {
 
 	fun getGapLength(sequence: String): Int = sequence.count {it == '-'}
 
 	fun getGapShare(sequence: String): Double = sequence.count {it == '-'}.toDouble()
 		.div(sequence.length)
 
-	fun removeGaps(): Sequence = Sequence(this.header, this.sequence.filter {it != '-'})
+	fun removeGaps(): BioSequence = BioSequence(this.header, this.sequence.filter {it != '-'})
 
 	override val id = this.header.split(" ")[0]
 
-	override val length = sequence.length
+	override val length: Int = sequence.length
 
-	override val gaplength: Int
-		get() = getGapLength(sequence)
+	override val gaplength: Int by lazy { getGapLength(sequence) }
 
 	fun getGapCount(): Int {
 		var count = 0
@@ -39,11 +38,9 @@ open class Sequence(final override val header: String, final override val sequen
 		return count
 	}
 
-	val xcount: Int 
-		get() = sequence.toUpperCase().count {it == 'X'}
+	val xcount: Int by lazy { sequence.toUpperCase().count {it == 'X'} }
 
-	val ncount: Int
-		get() = sequence.toUpperCase().count {it == 'N'}
+	val ncount: Int by lazy { sequence.toUpperCase().count {it == 'N'} }
 
 	private val _width = 60
 
@@ -64,18 +61,18 @@ open class Sequence(final override val header: String, final override val sequen
 	override fun getChar(i: Int): Char = this.sequence[i]
 
 	/* 1-based! */
-	open fun getLocus(start: Int, end: Int): Sequence{
+	open fun getLocus(start: Int, end: Int): BioSequence{
 		val nstart = if(start < 1) 1 else start
 		val nend = if(end > this.length + 1) this.length else end
 		val subseq = if(nend < nstart) this.sequence.substring(nend - 1, nstart).revComp() else
 			this.sequence.substring(nstart - 1, nend)
 		val head = "${this.id} ($start:$end)"
-		return Sequence(head, subseq)
+		return BioSequence(head, subseq)
 	}
 
 }
 
-class SeqQual(header: String, sequence: String, val qual: String): Sequence(header, sequence){
+class BioSeqQual(header: String, sequence: String, val qual: String): BioSequence(header, sequence){
 	
 	override fun formatted(): String = "@$header\n$sequence\n+\n$qual\n"
 	
@@ -92,9 +89,9 @@ class SeqQual(header: String, sequence: String, val qual: String): Sequence(head
 	
 	fun meanQual(): Int = round(phredScoreList.sum().toDouble().div(length)).toInt()
 
-	fun medianQual(): Int = phredScoreList.map{it.toInt()}.sum().div(length.toDouble()).toInt()
+	fun medianQual(): Int = phredScoreList.sorted()[length / 2]
 
-	override fun getLocus(start: Int, end: Int): SeqQual{
+	override fun getLocus(start: Int, end: Int): BioSeqQual{
 		val nstart = if(start < 1) 1 else start
 		val nend = if(end > this.length + 1) this.length else end
 		val seq = if(nend < nstart) this.sequence.substring(nend - 1, nstart).revComp() else
@@ -102,7 +99,7 @@ class SeqQual(header: String, sequence: String, val qual: String): Sequence(head
 		val qual = if(nend < nstart) this.qual.reversed().substring(nend - 1, nstart) else
 			this.sequence.substring(nstart - 1, nend)
 		val head = "${this.id} ($start:$end)"
-		return SeqQual(head, seq, qual)
+		return BioSeqQual(head, seq, qual)
 	}
 
 }
@@ -126,7 +123,7 @@ fun Char.complement(): Char{
 	}
 	}
 
-class DNA(header: String, sequence: String): Sequence(header, sequence) {
+class DNA(header: String, sequence: String): BioSequence(header, sequence) {
 
 	//Provisionally RNA functionality will be here
 	private val unambiguous = listOf('A','C','G','T')
@@ -143,8 +140,8 @@ class DNA(header: String, sequence: String): Sequence(header, sequence) {
 
 	/* GC skew = (G - C) / (G + C) */
 	val GCSkew: Double
-		get() = ( (baseCount['G'] ?: 0) - (baseCount['G'] ?: 0) ).toDouble()
-			.div( (baseCount['G'] ?: 0) + (baseCount['G'] ?: 0) )
+		get() = ( (baseCount['G'] ?: 0) - (baseCount['C'] ?: 0) ).toDouble()
+			.div( (baseCount['G'] ?: 0) + (baseCount['C'] ?: 0) )
 
 	fun getAmbiguousCount(dna: String): Int = dna.toUpperCase().count { it !in unambiguous }
 
@@ -164,7 +161,7 @@ class DNA(header: String, sequence: String): Sequence(header, sequence) {
 	
 }
 
-class RNA(header: String, sequence: String): Sequence(header, sequence){
+class RNA(header: String, sequence: String): BioSequence(header, sequence){
 
 	fun toDNA(seq: String): String = seq.map { convertACGUtoACGT(it) } .joinToString("")
 
@@ -180,7 +177,7 @@ class RNA(header: String, sequence: String): Sequence(header, sequence){
 
 }
 
-class Protein(header: String, sequence: String): Sequence(header, sequence) {
+class Protein(header: String, sequence: String): BioSequence(header, sequence) {
 
 	fun getAmbiguous(aa: String): Int = aa.toUpperCase().count {it == 'X'}
 
