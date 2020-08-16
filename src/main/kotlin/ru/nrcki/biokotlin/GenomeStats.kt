@@ -73,14 +73,15 @@ class GenomeStats(){
 			System.err.println("Empty file.")
 			exitProcess(1)
 		}
-		val genomeData = getStats(fastaRecords)
-		printGenomeStats(genomeData, outMode)
 
 		if(longMode){
 			println("ID\tLength\tGC, %\tN")
 			fastaRecords.forEach(){
 				println("${it.id}\t${it.length}\t${it.sequence.getGCContent()}\t${it.sequence.getNsCount()}")
 			}
+		}else{
+			val genomeData = getStats(fastaRecords)
+			printGenomeStats(genomeData, outMode)
 		}
 	}
 }

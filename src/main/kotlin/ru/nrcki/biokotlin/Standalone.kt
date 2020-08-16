@@ -9,6 +9,7 @@ fun main(args: Array<String>){
 	BioKotlin works in standalone mode.
 	Next commands are now supported:
 	GenomeStats <File> - output statistics for Fasta file.
+	GenomeStatsByContig <File> - output statistics for Fasta file for each contig.
 	FastqStats <File> - output statistics for Fastq file.
 	TetraStats <File> - output statistics for Fasta file.
 	AlignmentStats <File> - output statistics for Fasta alignment.
@@ -26,6 +27,7 @@ fun main(args: Array<String>){
 
 	when(args[0]){
 		"GenomeStats" -> GenomeStats().genomeStats(args[1])
+		"GenomeStatsByContig" -> GenomeStats().genomeStats(args[1], true)
 		"TetraStats" -> Tetra().genomeTetraStats(args[1])
 		"AlignmentStats" -> Alignment().printAlnInfo(Fasta().read(args[1]))
 		"AlignmentClearGaps" -> {
